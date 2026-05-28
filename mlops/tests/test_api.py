@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import MagicMock
 
 
-# ─── Datos de prueba ─────────────────────────────────────────────────────────
+# Datos de prueba
 VALID_CUSTOMER = {
     "gender": "Male",
     "SeniorCitizen": 0,
@@ -35,7 +35,7 @@ VALID_CUSTOMER = {
 }
 
 
-# ─── Helpers ─────────────────────────────────────────────────────────────────
+# Helpers
 def _mock_single(prob: float):
     m = MagicMock()
     m.predict_proba.return_value = np.array([[1 - prob, prob]])
@@ -48,18 +48,18 @@ def _mock_batch(probs: list[float]):
     return m
 
 
-# ─── Fixture: bloquea joblib.load para TODOS los tests ───────────────────────
+# Fixture: bloquea joblib.load para TODOS los tests 
 @pytest.fixture(autouse=True)
 def no_disk_load(monkeypatch):
     """Impide que el lifespan lea model.joblib del disco en cualquier test."""
     monkeypatch.setattr("app.main.joblib.load", lambda path: _mock_single(0.75))
 
 
-# ─── Fixtures de cliente ─────────────────────────────────────────────────────
+# Fixtures de cliente 
 @pytest.fixture
 def client():
     """Cliente estándar: modelo mock (prob=0.75) cargado por lifespan."""
-    from app.api import app
+    from mlops.app.api import app
     with TestClient(app) as c:
         yield c
 
@@ -67,14 +67,14 @@ def client():
 @pytest.fixture
 def client_no_model():
     """Cliente sin modelo: limpia model_store después de que lifespan corra."""
-    from app.api import app, model_store
+    from mlops.app.api import app, model_store
     with TestClient(app) as c:
-        model_store.clear()   # vaciar DESPUÉS del lifespan
+        model_store.clear()   
         yield c
     model_store.clear()
 
 
-# ─── Tests: /health ──────────────────────────────────────────────────────────
+# Tests:
 class TestHealth:
     def test_health_ok_with_model(self, client):
         r = client.get("/health")
@@ -89,7 +89,7 @@ class TestHealth:
         assert r.json()["model_loaded"] is False
 
 
-# ─── Tests: /predict ─────────────────────────────────────────────────────────
+# Tests: 
 class TestPredict:
     def test_predict_returns_200(self, client):
         r = client.post("/predict", json=VALID_CUSTOMER)
@@ -109,7 +109,7 @@ class TestPredict:
         assert 0.0 <= pred["churn_probability"] <= 1.0
 
     def test_predict_low_prob_no_churn(self):
-        from app.api import app, model_store
+        from mlops.app.api import app, model_store
         model_store["pipeline"] = _mock_single(0.20)
         with TestClient(app) as c:
             pred = c.post("/predict", json=VALID_CUSTOMER).json()["prediction"]
@@ -117,7 +117,7 @@ class TestPredict:
         assert pred["risk_level"] == "BAJO"
 
     def test_predict_medium_risk(self):
-        from app.api import app, model_store
+        from mlops.app.api import app, model_store
         model_store["pipeline"] = _mock_single(0.55)
         with TestClient(app) as c:
             pred = c.post("/predict", json=VALID_CUSTOMER).json()["prediction"]
@@ -148,10 +148,10 @@ class TestPredict:
         assert "x-response-time-ms" in r.headers
 
 
-# ─── Tests: /predict/batch ───────────────────────────────────────────────────
+#  Tests: /predict/batch
 class TestPredictBatch:
     def test_batch_single_customer(self):
-        from app.api import app, model_store
+        from mlops.app.api import app, model_store
         model_store["pipeline"] = _mock_batch([0.8])
         with TestClient(app) as c:
             body = c.post("/predict/batch", json={"customers": [VALID_CUSTOMER]}).json()
@@ -159,18 +159,18 @@ class TestPredictBatch:
         assert body["predicted_churners"] == 1
 
     def test_batch_multiple_customers(self):
-        from app.api import app, model_store
+        from mlops.app.api import app, model_store
         probs = [0.9, 0.2, 0.6, 0.1, 0.75]
         model_store["pipeline"] = _mock_batch(probs)
         with TestClient(app) as c:
             body = c.post("/predict/batch",
                           json={"customers": [VALID_CUSTOMER] * 5}).json()
         assert body["total_customers"] == 5
-        assert body["predicted_churners"] == 3   # 0.9, 0.6, 0.75 > 0.5
+        assert body["predicted_churners"] == 3  
         assert body["churn_rate_predicted"] == pytest.approx(0.6, abs=0.01)
 
     def test_batch_all_churners(self):
-        from app.api import app, model_store
+        from mlops.app.api import app, model_store
         model_store["pipeline"] = _mock_batch([0.8, 0.9])
         with TestClient(app) as c:
             body = c.post("/predict/batch",
@@ -187,10 +187,10 @@ class TestPredictBatch:
         assert r.status_code == 503
 
 
-# ─── Tests: lógica de niveles de riesgo ──────────────────────────────────────
+# Tests: lógica de niveles de riesgo 
 class TestRiskLevel:
     def test_risk_levels_boundaries(self):
-        from app.api import _risk_level
+        from mlops.app.api import _risk_level
         assert _risk_level(0.00) == "BAJO"
         assert _risk_level(0.39) == "BAJO"
         assert _risk_level(0.40) == "MEDIO"

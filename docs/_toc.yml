@@ -4,6 +4,6 @@
 format: jb-book
 root: intro
 chapters:
-- file: markdown
-- file: notebooks
-- file: markdown-notebooks
+- file: 1_eda_preprocessing
+- file: 2_model_training
+- file: 3_monitoring_mlops

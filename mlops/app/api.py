@@ -16,34 +16,28 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
-# ─── Logging ────────────────────────────────────────────────────────────────
+# Logging 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s",
 )
 logger = logging.getLogger(__name__)
 
-# ─── Constantes ─────────────────────────────────────────────────────────────
+
 MODEL_PATH = os.getenv("MODEL_PATH", "app/model.joblib")
 CHURN_THRESHOLD = float(os.getenv("CHURN_THRESHOLD", "0.5"))
 
-# ─── Estado global del modelo ──────────────────────────────────────────────
+
 model_store: dict = {}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Intenta cargar el modelo al arrancar.
-    Si no existe, el servicio arranca igualmente
-    y los endpoints devuelven 503.
-    """
 
     logger.info("Cargando modelo desde %s …", MODEL_PATH)
 
     try:
-        # IMPORTANTE:
-        # No sobrescribir mocks en tests
+  
         if "pipeline" not in model_store:
             model_store["pipeline"] = joblib.load(MODEL_PATH)
 
@@ -64,7 +58,7 @@ async def lifespan(app: FastAPI):
     logger.info("Modelo descargado. Servicio apagado.")
 
 
-# ─── App ───────────────────────────────────────────────────────────────────
+# App 
 app = FastAPI(
     title="Telco Churn Prediction API",
     description="Servicio de inferencia para predicción de churn.",
@@ -80,7 +74,7 @@ app.add_middleware(
 )
 
 
-# ─── Middleware de latencia ────────────────────────────────────────────────
+# Middleware de latencia
 @app.middleware("http")
 async def add_latency_header(request: Request, call_next):
     start = time.perf_counter()
@@ -93,7 +87,7 @@ async def add_latency_header(request: Request, call_next):
     return response
 
 
-# ─── Schemas ───────────────────────────────────────────────────────────────
+# Schemas
 class CustomerFeatures(BaseModel):
     gender: str = Field(..., examples=["Male", "Female"])
     SeniorCitizen: int = Field(..., ge=0, le=1)
@@ -178,7 +172,7 @@ class HealthResponse(BaseModel):
     model_config = {"protected_namespaces": ()}
 
 
-# ─── Helpers ───────────────────────────────────────────────────────────────
+# Helpers 
 def _risk_level(prob: float) -> str:
     if prob >= 0.70:
         return "ALTO"
@@ -197,7 +191,7 @@ def _require_model():
         )
 
 
-# ─── Endpoints ─────────────────────────────────────────────────────────────
+# Endpoints
 @app.get("/health", response_model=HealthResponse, tags=["Sistema"])
 def health():
     return HealthResponse(

@@ -1,0 +1,1199 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>3. Monitoreo del Modelo en Producción — MLOps &#8212; Mini proyecto 3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '3_monitoring_mlops';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="2. Preprocesamiento + Modelado con Pipelines y GridSearchCV" href="2_model_training.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Mini proyecto 3 - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Mini proyecto 3 - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Welcome to your Jupyter Book
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1_eda_preprocessing.html">1. EDA  Telco Customer Churn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2_model_training.html">2. Preprocesamiento + Modelado con Pipelines y GridSearchCV</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Monitoreo del Modelo en Producción — MLOps</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2F3_monitoring_mlops.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/3_monitoring_mlops.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3. Monitoreo del Modelo en Producción — MLOps</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importaciones">3.1 Importaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estrategia-de-monitoreo-vision-general">3.2 Estrategia de Monitoreo: Visión General</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriva-de-datos-data-drift">3.3 Deriva de Datos (Data Drift)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prueba-de-kolmogorov-smirnov-ks-variables-numericas">3.3.1 Prueba de Kolmogorov-Smirnov (KS) — Variables numéricas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prueba-chi-cuadrado-variables-categoricas">3.3.2 Prueba Chi-cuadrado — Variables categóricas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizacion-de-distribuciones-referencia-vs-produccion">3.3.3 Visualización de distribuciones (referencia vs producción)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriva-del-modelo-model-drift-concept-drift">3.4 Deriva del Modelo (Model Drift / Concept Drift)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ventana-deslizante-de-auc-roc-rolling-auc">3.4.1 Ventana deslizante de AUC-ROC (Rolling AUC)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-deriva-del-modelo">📋 Análisis — Deriva del modelo</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#monitoreo-de-distribucion-de-predicciones">3.5 Monitoreo de Distribución de Predicciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-de-produccion-del-servicio">3.6 Métricas de Producción del Servicio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plan-de-alertas-y-re-entrenamiento">3.7 Plan de Alertas y Re-entrenamiento</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herramientas-recomendadas">Herramientas recomendadas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#frecuencia-de-re-entrenamiento-recomendada">Frecuencia de re-entrenamiento recomendada</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusiones-del-monitoreo">3.8 Conclusiones del Monitoreo</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="monitoreo-del-modelo-en-produccion-mlops">
+<h1>3. Monitoreo del Modelo en Producción — MLOps<a class="headerlink" href="#monitoreo-del-modelo-en-produccion-mlops" title="Permalink to this heading">#</a></h1>
+<p>Este notebook documenta la estrategia completa de monitoreo para el modelo de churn desplegado,
+cubriendo tres áreas principales:</p>
+<ol class="arabic simple">
+<li><p><strong>Deriva de datos (Data Drift)</strong> — ¿los datos de entrada siguen siendo similares a los de entrenamiento?</p></li>
+<li><p><strong>Deriva del modelo (Model Drift / Concept Drift)</strong> — ¿el rendimiento del modelo se degrada con el tiempo?</p></li>
+<li><p><strong>Métricas de producción</strong> — ¿el servicio responde correctamente y a tiempo?</p></li>
+</ol>
+<section id="importaciones">
+<h2>3.1 Importaciones<a class="headerlink" href="#importaciones" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;whitegrid&#39;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;muted&#39;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Librerías de monitoreo cargadas.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Librerías de monitoreo cargadas.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="estrategia-de-monitoreo-vision-general">
+<h2>3.2 Estrategia de Monitoreo: Visión General<a class="headerlink" href="#estrategia-de-monitoreo-vision-general" title="Permalink to this heading">#</a></h2>
+<p>El monitoreo de un modelo en producción tiene cuatro capas:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capa</p></th>
+<th class="head"><p>Qué monitorea</p></th>
+<th class="head"><p>Herramienta sugerida</p></th>
+<th class="head"><p>Frecuencia</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Infraestructura</strong></p></td>
+<td><p>CPU, RAM, latencia del servicio</p></td>
+<td><p>Prometheus + Grafana</p></td>
+<td><p>Tiempo real</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Datos de entrada</strong></p></td>
+<td><p>Deriva en distribución de features</p></td>
+<td><p>Evidently AI / NannyML</p></td>
+<td><p>Diario / semanal</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Predicciones</strong></p></td>
+<td><p>Distribución de probabilidades y scores</p></td>
+<td><p>Logs + dashboards</p></td>
+<td><p>Diario</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Rendimiento del modelo</strong></p></td>
+<td><p>Accuracy, AUC, Recall vs. etiquetas reales</p></td>
+<td><p>Evidently AI</p></td>
+<td><p>Semanal / mensual</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<div><p><strong>Nota:</strong> Las etiquetas reales (¿el cliente realmente abandonó?) llegan con retraso (semanas o meses).<br />
+Por eso el monitoreo de deriva de datos es crítico: detecta problemas <em>antes</em> de que las métricas de rendimiento lo reflejen.</p>
+</div></blockquote>
+</section>
+<section id="deriva-de-datos-data-drift">
+<h2>3.3 Deriva de Datos (Data Drift)<a class="headerlink" href="#deriva-de-datos-data-drift" title="Permalink to this heading">#</a></h2>
+<p>La <strong>deriva de datos</strong> ocurre cuando la distribución de los datos de entrada en producción
+se aleja de la distribución vista durante el entrenamiento.</p>
+<section id="prueba-de-kolmogorov-smirnov-ks-variables-numericas">
+<h3>3.3.1 Prueba de Kolmogorov-Smirnov (KS) — Variables numéricas<a class="headerlink" href="#prueba-de-kolmogorov-smirnov-ks-variables-numericas" title="Permalink to this heading">#</a></h3>
+<p>La prueba KS mide si dos muestras provienen de la misma distribución.</p>
+<ul class="simple">
+<li><p>p-valor &gt; 0.05 → no hay evidencia de deriva</p></li>
+<li><p>p-valor ≤ 0.05 → deriva detectada</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">detect_numerical_drift</span><span class="p">(</span><span class="n">train_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                            <span class="n">prod_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                            <span class="n">num_cols</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                            <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aplica la prueba KS a cada variable numérica.</span>
+<span class="sd">    Retorna un DataFrame con estadísticos y veredicto.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">num_cols</span><span class="p">:</span>
+        <span class="n">ks_stat</span><span class="p">,</span> <span class="n">p_val</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">ks_2samp</span><span class="p">(</span><span class="n">train_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span>
+                                         <span class="n">prod_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Feature&#39;</span><span class="p">:</span>     <span class="n">col</span><span class="p">,</span>
+            <span class="s1">&#39;KS Statistic&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">ks_stat</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;p-valor&#39;</span><span class="p">:</span>     <span class="nb">round</span><span class="p">(</span><span class="n">p_val</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;Drift&#39;</span><span class="p">:</span>       <span class="s1">&#39;⚠️ SÍ&#39;</span> <span class="k">if</span> <span class="n">p_val</span> <span class="o">&lt;=</span> <span class="n">alpha</span> <span class="k">else</span> <span class="s1">&#39;✅ NO&#39;</span>
+        <span class="p">})</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;p-valor&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># ── Simulación: datos de entrenamiento vs producción con deriva artificial ──</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+<span class="n">n_train</span> <span class="o">=</span> <span class="mi">5634</span>
+<span class="n">n_prod</span>  <span class="o">=</span> <span class="mi">800</span>
+
+<span class="n">train_ref</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;tenure&#39;</span><span class="p">:</span>         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_train</span><span class="p">),</span>
+    <span class="s1">&#39;MonthlyCharges&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_train</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">118</span><span class="p">),</span>
+    <span class="s1">&#39;TotalCharges&#39;</span><span class="p">:</span>   <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_train</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="s1">&#39;SeniorCitizen&#39;</span><span class="p">:</span>  <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_train</span><span class="p">),</span>
+<span class="p">})</span>
+
+<span class="c1"># Simular deriva: nuevos clientes con tenure mucho menor y cargos más altos</span>
+<span class="n">prod_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;tenure&#39;</span><span class="p">:</span>         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_prod</span><span class="p">),</span>   <span class="c1"># DERIVA</span>
+    <span class="s1">&#39;MonthlyCharges&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_prod</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">118</span><span class="p">),</span>  <span class="c1"># leve</span>
+    <span class="s1">&#39;TotalCharges&#39;</span><span class="p">:</span>   <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_prod</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>   <span class="c1"># DERIVA</span>
+    <span class="s1">&#39;SeniorCitizen&#39;</span><span class="p">:</span>  <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_prod</span><span class="p">),</span>       <span class="c1"># estable</span>
+<span class="p">})</span>
+
+<span class="n">num_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tenure&#39;</span><span class="p">,</span> <span class="s1">&#39;MonthlyCharges&#39;</span><span class="p">,</span> <span class="s1">&#39;TotalCharges&#39;</span><span class="p">,</span> <span class="s1">&#39;SeniorCitizen&#39;</span><span class="p">]</span>
+<span class="n">drift_report</span> <span class="o">=</span> <span class="n">detect_numerical_drift</span><span class="p">(</span><span class="n">train_ref</span><span class="p">,</span> <span class="n">prod_data</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">drift_report</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>       Feature  KS Statistic  p-valor Drift
+        tenure        0.3976   0.0000 ⚠️ SÍ
+MonthlyCharges        0.2456   0.0000 ⚠️ SÍ
+  TotalCharges        0.3299   0.0000 ⚠️ SÍ
+ SeniorCitizen        0.0210   0.9107  ✅ NO
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="prueba-chi-cuadrado-variables-categoricas">
+<h3>3.3.2 Prueba Chi-cuadrado — Variables categóricas<a class="headerlink" href="#prueba-chi-cuadrado-variables-categoricas" title="Permalink to this heading">#</a></h3>
+<p>Para variables categóricas, se compara la distribución de frecuencias
+entre entrenamiento y producción con la prueba Chi-cuadrado.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">detect_categorical_drift</span><span class="p">(</span><span class="n">train_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                              <span class="n">prod_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                              <span class="n">cat_cols</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                              <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prueba Chi-cuadrado por variable categórica.</span>
+<span class="sd">    Normaliza las frecuencias de producción para comparar proporciones.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cat_cols</span><span class="p">:</span>
+        <span class="n">train_counts</span> <span class="o">=</span> <span class="n">train_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+        <span class="n">prod_counts</span>  <span class="o">=</span> <span class="n">prod_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+
+        <span class="c1"># Alinear categorías (puede haber categorías nuevas en producción)</span>
+        <span class="n">all_cats</span> <span class="o">=</span> <span class="n">train_counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">prod_counts</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">train_aligned</span> <span class="o">=</span> <span class="n">train_counts</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">all_cats</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">prod_aligned</span>  <span class="o">=</span> <span class="n">prod_counts</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">all_cats</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Escalar producción al tamaño de entrenamiento</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prod_df</span><span class="p">)</span>
+        <span class="n">prod_expected</span> <span class="o">=</span> <span class="n">prod_aligned</span> <span class="o">*</span> <span class="n">scale</span>
+
+        <span class="n">chi2</span><span class="p">,</span> <span class="n">p_val</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">chisquare</span><span class="p">(</span><span class="n">f_obs</span><span class="o">=</span><span class="n">train_aligned</span><span class="p">,</span>
+                                       <span class="n">f_exp</span><span class="o">=</span><span class="n">prod_expected</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">))</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Feature&#39;</span><span class="p">:</span>        <span class="n">col</span><span class="p">,</span>
+            <span class="s1">&#39;Chi2 Statistic&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">chi2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="s1">&#39;p-valor&#39;</span><span class="p">:</span>        <span class="nb">round</span><span class="p">(</span><span class="n">p_val</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;Drift&#39;</span><span class="p">:</span>          <span class="s1">&#39;⚠️ SÍ&#39;</span> <span class="k">if</span> <span class="n">p_val</span> <span class="o">&lt;=</span> <span class="n">alpha</span> <span class="k">else</span> <span class="s1">&#39;✅ NO&#39;</span>
+        <span class="p">})</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;p-valor&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Simulación de categorías</span>
+<span class="n">contracts_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;Month-to-month&#39;</span><span class="p">,</span> <span class="s1">&#39;One year&#39;</span><span class="p">,</span> <span class="s1">&#39;Two year&#39;</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">n_train</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.24</span><span class="p">,</span> <span class="mf">0.21</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="c1"># En producción: más contratos mensuales (posible deriva de negocio)</span>
+<span class="n">contracts_prod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;Month-to-month&#39;</span><span class="p">,</span> <span class="s1">&#39;One year&#39;</span><span class="p">,</span> <span class="s1">&#39;Two year&#39;</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">n_prod</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">]</span>   <span class="c1"># DERIVA</span>
+<span class="p">)</span>
+
+<span class="n">internet_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;Fiber optic&#39;</span><span class="p">,</span> <span class="s1">&#39;DSL&#39;</span><span class="p">,</span> <span class="s1">&#39;No&#39;</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">n_train</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.34</span><span class="p">,</span> <span class="mf">0.22</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">internet_prod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;Fiber optic&#39;</span><span class="p">,</span> <span class="s1">&#39;DSL&#39;</span><span class="p">,</span> <span class="s1">&#39;No&#39;</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">n_prod</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.21</span><span class="p">]</span>   <span class="c1"># estable</span>
+<span class="p">)</span>
+
+<span class="n">train_cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Contract&#39;</span><span class="p">:</span> <span class="n">contracts_train</span><span class="p">,</span> <span class="s1">&#39;InternetService&#39;</span><span class="p">:</span> <span class="n">internet_train</span><span class="p">})</span>
+<span class="n">prod_cat</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Contract&#39;</span><span class="p">:</span> <span class="n">contracts_prod</span><span class="p">,</span>  <span class="s1">&#39;InternetService&#39;</span><span class="p">:</span> <span class="n">internet_prod</span><span class="p">})</span>
+
+<span class="n">cat_drift</span> <span class="o">=</span> <span class="n">detect_categorical_drift</span><span class="p">(</span><span class="n">train_cat</span><span class="p">,</span> <span class="n">prod_cat</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Contract&#39;</span><span class="p">,</span> <span class="s1">&#39;InternetService&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cat_drift</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>        Feature  Chi2 Statistic  p-valor Drift
+       Contract        1325.846   0.0000 ⚠️ SÍ
+InternetService           3.555   0.1691  ✅ NO
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="visualizacion-de-distribuciones-referencia-vs-produccion">
+<h3>3.3.3 Visualización de distribuciones (referencia vs producción)<a class="headerlink" href="#visualizacion-de-distribuciones-referencia-vs-produccion" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">features_to_plot</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;tenure&#39;</span><span class="p">,</span>         <span class="s1">&#39;Antigüedad (meses)&#39;</span><span class="p">,</span>       <span class="s1">&#39;#4C8EDA&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;MonthlyCharges&#39;</span><span class="p">,</span> <span class="s1">&#39;Cargos mensuales (USD)&#39;</span><span class="p">,</span>    <span class="s1">&#39;#E05C5C&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">,</span>   <span class="s1">&#39;Cargos totales (USD)&#39;</span><span class="p">,</span>      <span class="s1">&#39;#5CBE6E&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">features_to_plot</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">train_ref</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.55</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#7a7a7a&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Entrenamiento&#39;</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">prod_data</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>  <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Producción&#39;</span><span class="p">,</span>    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Densidad&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Deriva de datos — Distribuciones: Entrenamiento vs Producción&#39;</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_data_drift.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/6ad434905049831ebc573b6a15c39cd53f9da68af25ab85c902a94cdb95936df.png" src="_images/6ad434905049831ebc573b6a15c39cd53f9da68af25ab85c902a94cdb95936df.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="deriva-del-modelo-model-drift-concept-drift">
+<h2>3.4 Deriva del Modelo (Model Drift / Concept Drift)<a class="headerlink" href="#deriva-del-modelo-model-drift-concept-drift" title="Permalink to this heading">#</a></h2>
+<p>La <strong>deriva del modelo</strong> ocurre cuando la relación entre las features y el target cambia,
+incluso si los datos de entrada no han cambiado. Se detecta comparando métricas de rendimiento
+a lo largo del tiempo, conforme llegan etiquetas reales de producción.</p>
+<section id="ventana-deslizante-de-auc-roc-rolling-auc">
+<h3>3.4.1 Ventana deslizante de AUC-ROC (Rolling AUC)<a class="headerlink" href="#ventana-deslizante-de-auc-roc-rolling-auc" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">roc_auc_score</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rolling_auc</span><span class="p">(</span><span class="n">y_true_series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+                <span class="n">y_prob_series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+                <span class="n">window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calcula AUC-ROC sobre una ventana deslizante de `window` predicciones.</span>
+<span class="sd">    Útil para detectar degradación gradual del modelo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">aucs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_true_series</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">yt</span> <span class="o">=</span> <span class="n">y_true_series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">window</span><span class="p">:</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">yp</span> <span class="o">=</span> <span class="n">y_prob_series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">window</span><span class="p">:</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">yt</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>       <span class="c1"># necesitamos ambas clases en la ventana</span>
+            <span class="n">aucs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">aucs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">yt</span><span class="p">,</span> <span class="n">yp</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">aucs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">y_true_series</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">window</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:])</span>
+
+
+<span class="c1"># Simulación: 2 000 predicciones de producción con degradación gradual</span>
+<span class="n">n_prod_preds</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+
+<span class="c1"># Fase 1 (primeras 1200): modelo estable, AUC ≈ 0.85</span>
+<span class="n">probs_stable</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">labels_stable</span> <span class="o">=</span> <span class="p">(</span><span class="n">probs_stable</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># Fase 2 (últimas 800): degradación — el modelo pierde discriminación</span>
+<span class="n">probs_drift</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.25</span><span class="p">,</span> <span class="mi">800</span><span class="p">),</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">)</span>
+<span class="n">labels_drift</span>  <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">800</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.265</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># etiquetas más aleatorias</span>
+
+<span class="n">all_probs</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">probs_stable</span><span class="p">,</span> <span class="n">probs_drift</span><span class="p">]))</span>
+<span class="n">all_labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">labels_stable</span><span class="p">,</span> <span class="n">labels_drift</span><span class="p">]))</span>
+
+<span class="n">rolling_scores</span> <span class="o">=</span> <span class="n">rolling_auc</span><span class="p">(</span><span class="n">all_labels</span><span class="p">,</span> <span class="n">all_probs</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># Umbral de alerta: si AUC cae más del 5% respecto al AUC de entrenamiento</span>
+<span class="n">BASELINE_AUC</span>   <span class="o">=</span> <span class="mf">0.8476</span>
+<span class="n">ALERT_THRESHOLD</span> <span class="o">=</span> <span class="n">BASELINE_AUC</span> <span class="o">*</span> <span class="mf">0.95</span>   <span class="c1"># = 0.8052</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rolling_scores</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">rolling_scores</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Rolling AUC (ventana=200)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">BASELINE_AUC</span><span class="p">,</span>    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#5CBE6E&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+           <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;AUC baseline (test) = </span><span class="si">{</span><span class="n">BASELINE_AUC</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">ALERT_THRESHOLD</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#E05C5C&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+           <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Umbral de alerta (−5%) = </span><span class="si">{</span><span class="n">ALERT_THRESHOLD</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">rolling_scores</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">rolling_scores</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">ALERT_THRESHOLD</span><span class="p">,</span>
+                <span class="n">where</span><span class="o">=</span><span class="n">rolling_scores</span><span class="o">.</span><span class="n">values</span> <span class="o">&lt;</span> <span class="n">ALERT_THRESHOLD</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#E05C5C&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Zona de alerta&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Número de predicción acumulada&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;AUC-ROC&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.60</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Deriva del modelo — AUC-ROC en ventana deslizante (producción simulada)&#39;</span><span class="p">,</span>
+             <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower left&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_model_drift.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">AUC mínimo en producción: </span><span class="si">{</span><span class="n">rolling_scores</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predicciones con AUC &lt; umbral: </span><span class="si">{</span><span class="p">(</span><span class="n">rolling_scores</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ALERT_THRESHOLD</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/d34a1ab805e878bb7e93223b1882486395cf31b99aea21a383d75e5f4a24d1a6.png" src="_images/d34a1ab805e878bb7e93223b1882486395cf31b99aea21a383d75e5f4a24d1a6.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AUC mínimo en producción: 0.4252
+Predicciones con AUC &lt; umbral: 1801
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="analisis-deriva-del-modelo">
+<h3>📋 Análisis — Deriva del modelo<a class="headerlink" href="#analisis-deriva-del-modelo" title="Permalink to this heading">#</a></h3>
+<p>La simulación reproduce un escenario realista de degradación gradual:</p>
+<ul class="simple">
+<li><p><strong>Fase estable (predicciones 1–1200):</strong> el AUC oscila alrededor del baseline de 0.8476.</p></li>
+<li><p><strong>Fase de deriva (predicciones 1200–2000):</strong> el AUC cae progresivamente hasta cruzar el umbral de alerta (0.8052).</p></li>
+</ul>
+<p><strong>Causas comunes de concept drift en churn:</strong></p>
+<ul class="simple">
+<li><p>Cambios en la estrategia comercial (nuevos planes, promociones).</p></li>
+<li><p>Entrada de competidores → el perfil del cliente insatisfecho cambia.</p></li>
+<li><p>Cambios económicos (inflación, recesión) que alteran el comportamiento de cancelación.</p></li>
+</ul>
+<p><strong>Acción recomendada al detectar deriva:</strong> re-entrenar el modelo con datos recientes usando el mismo pipeline del Notebook 2.</p>
+</section>
+</section>
+<section id="monitoreo-de-distribucion-de-predicciones">
+<h2>3.5 Monitoreo de Distribución de Predicciones<a class="headerlink" href="#monitoreo-de-distribucion-de-predicciones" title="Permalink to this heading">#</a></h2>
+<p>Incluso sin etiquetas reales, se puede monitorear la distribución de las <strong>probabilidades predichas</strong>.
+Un cambio en esta distribución puede ser una señal temprana de deriva.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simular predicciones semanales</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+<span class="n">weeks</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Semana </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)]</span>
+<span class="n">weekly_probs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">1.8</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S1 — baseline</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">1.8</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S2</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S3 — leve</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S4</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S5 — notable</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">2.8</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S6</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S7 — fuerte</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>   <span class="c1"># S8 — alerta</span>
+<span class="p">]</span>
+
+<span class="c1"># Tasa de churn predicha por semana (prob &gt; 0.5)</span>
+<span class="n">predicted_rates</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">weekly_probs</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Histograma de distribución de probabilidades</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">week</span><span class="p">,</span> <span class="n">probs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">weeks</span><span class="p">,</span> <span class="n">weekly_probs</span><span class="p">)):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">i</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">),</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">week</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Distribución de probabilidades predichas por semana&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Probabilidad de Churn&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Densidad&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Tasa de churn predicha a lo largo del tiempo</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">weeks</span><span class="p">,</span> <span class="n">predicted_rates</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">predicted_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#E05C5C&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;+20</span><span class="si">% d</span><span class="s1">e alerta&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">weeks</span><span class="p">)),</span> <span class="n">predicted_rates</span><span class="p">,</span>
+                 <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Tasa de churn predicha por semana&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Churn rate predicho&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">weeks</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">PercentFormatter</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_prediction_distribution.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tasa de churn predicha por semana:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">weeks</span><span class="p">,</span> <span class="n">predicted_rates</span><span class="p">):</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39; ⚠️&#39;</span> <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">predicted_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.20</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">r</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%</span><span class="si">{</span><span class="n">flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/5e1702e96db192815e7922be75dad31fd66b0caa14652c718935a5e51c59da93.png" src="_images/5e1702e96db192815e7922be75dad31fd66b0caa14652c718935a5e51c59da93.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tasa de churn predicha por semana:
+  Semana 1: 4.0%
+  Semana 2: 8.0% ⚠️
+  Semana 3: 10.3% ⚠️
+  Semana 4: 16.3% ⚠️
+  Semana 5: 25.0% ⚠️
+  Semana 6: 36.3% ⚠️
+  Semana 7: 35.3% ⚠️
+  Semana 8: 49.0% ⚠️
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="metricas-de-produccion-del-servicio">
+<h2>3.6 Métricas de Producción del Servicio<a class="headerlink" href="#metricas-de-produccion-del-servicio" title="Permalink to this heading">#</a></h2>
+<p>Además del rendimiento del modelo, el servicio FastAPI debe monitorearse como infraestructura.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simular logs de producción del servicio FastAPI</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+<span class="n">n_requests</span> <span class="o">=</span> <span class="mi">500</span>
+
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2024-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="n">n_requests</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;5min&#39;</span><span class="p">)</span>
+
+<span class="c1"># Latencias (ms): mayoría rápidas, algunos outliers</span>
+<span class="n">latencies_ms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">480</span><span class="p">),</span>   <span class="c1"># normal</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>                  <span class="c1"># outliers lentos</span>
+<span class="p">])</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">latencies_ms</span><span class="p">)</span>
+
+<span class="c1"># Códigos HTTP simulados (97% 200, 2% 422, 1% 503)</span>
+<span class="n">status_codes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">422</span><span class="p">,</span> <span class="mi">503</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">n_requests</span><span class="p">,</span>
+    <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.97</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">logs_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span>   <span class="n">timestamps</span><span class="p">,</span>
+    <span class="s1">&#39;latency_ms&#39;</span><span class="p">:</span>  <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">latencies_ms</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s1">&#39;status_code&#39;</span><span class="p">:</span> <span class="n">status_codes</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">logs_df</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logs_df</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+
+<span class="c1"># ── Resumen por hora ─────────────────────────────────────────</span>
+<span class="n">hourly</span> <span class="o">=</span> <span class="n">logs_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;hour&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+    <span class="n">requests</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;status_code&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">),</span>
+    <span class="n">p50_ms</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;latency_ms&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">50</span><span class="p">)),</span>
+    <span class="n">p95_ms</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;latency_ms&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">95</span><span class="p">)),</span>
+    <span class="n">p99_ms</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;latency_ms&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">99</span><span class="p">)),</span>
+    <span class="n">error_rate</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;status_code&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="c1"># ── Visualización ────────────────────────────────────────────</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Latencia por percentil a lo largo del tiempo</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hourly</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span> <span class="n">hourly</span><span class="p">[</span><span class="s1">&#39;p50_ms&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;P50&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#5CBE6E&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hourly</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span> <span class="n">hourly</span><span class="p">[</span><span class="s1">&#39;p95_ms&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;P95&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#F0A500&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hourly</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span> <span class="n">hourly</span><span class="p">[</span><span class="s1">&#39;p99_ms&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;P99&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#E05C5C&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SLA: 200ms&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Latencia del servicio por percentil&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Latencia (ms)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+<span class="c1"># Tasa de error por hora</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hourly</span><span class="p">)),</span> <span class="n">hourly</span><span class="p">[</span><span class="s1">&#39;error_rate&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#E05C5C&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#F0A500&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Umbral: 5</span><span class="si">% e</span><span class="s1">rrores&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Tasa de error por hora (%)&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Error rate (%)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Métricas de producción — Servicio FastAPI&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_service_metrics.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Resumen global del servicio ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total requests:    </span><span class="si">{</span><span class="n">n_requests</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tasa de éxito:     </span><span class="si">{</span><span class="p">(</span><span class="n">status_codes</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Latencia mediana:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">latencies_ms</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Latencia P95:      </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">latencies_ms</span><span class="p">,</span><span class="w"> </span><span class="mi">95</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Latencia P99:      </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">latencies_ms</span><span class="p">,</span><span class="w"> </span><span class="mi">99</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/57a7021451abb020c47e6f280dd1302eb63a995a8da1f504b23e4e400e802f6a.png" src="_images/57a7021451abb020c47e6f280dd1302eb63a995a8da1f504b23e4e400e802f6a.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Resumen global del servicio ===
+Total requests:    500
+Tasa de éxito:     96.8%
+Latencia mediana:  34.1 ms
+Latencia P95:      79.7 ms
+Latencia P99:      1380.4 ms
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="plan-de-alertas-y-re-entrenamiento">
+<h2>3.7 Plan de Alertas y Re-entrenamiento<a class="headerlink" href="#plan-de-alertas-y-re-entrenamiento" title="Permalink to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Condición</p></th>
+<th class="head"><p>Umbral</p></th>
+<th class="head"><p>Acción</p></th>
+<th class="head"><p>Responsable</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AUC-ROC rolling &lt; 0.805</p></td>
+<td><p>−5% del baseline</p></td>
+<td><p>Alerta inmediata + análisis de causa</p></td>
+<td><p>Equipo ML</p></td>
+</tr>
+<tr class="row-odd"><td><p>KS p-valor &lt; 0.05 en <code class="docutils literal notranslate"><span class="pre">tenure</span></code> o <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code></p></td>
+<td><p>—</p></td>
+<td><p>Revisar deriva + considerar re-entrenamiento</p></td>
+<td><p>Equipo ML</p></td>
+</tr>
+<tr class="row-even"><td><p>Churn rate predicho &gt; 35% semanal</p></td>
+<td><p>+32% del baseline 26.5%</p></td>
+<td><p>Alerta de negocio</p></td>
+<td><p>Producto + ML</p></td>
+</tr>
+<tr class="row-odd"><td><p>Latencia P95 &gt; 500ms</p></td>
+<td><p>—</p></td>
+<td><p>Escalar réplicas / optimizar pipeline</p></td>
+<td><p>DevOps</p></td>
+</tr>
+<tr class="row-even"><td><p>Tasa de errores HTTP &gt; 5%</p></td>
+<td><p>—</p></td>
+<td><p>Revisar logs + rollback si es necesario</p></td>
+<td><p>DevOps</p></td>
+</tr>
+<tr class="row-odd"><td><p>Semanas sin re-entrenamiento &gt; 8</p></td>
+<td><p>—</p></td>
+<td><p>Re-entrenamiento proactivo obligatorio</p></td>
+<td><p>Equipo ML</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="herramientas-recomendadas">
+<h3>Herramientas recomendadas<a class="headerlink" href="#herramientas-recomendadas" title="Permalink to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Necesidad</p></th>
+<th class="head"><p>Herramienta</p></th>
+<th class="head"><p>Por qué</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Monitoreo de deriva</p></td>
+<td><p><strong>Evidently AI</strong></p></td>
+<td><p>Open source, integración nativa con Pandas; genera reportes HTML automáticos</p></td>
+</tr>
+<tr class="row-odd"><td><p>Monitoreo sin etiquetas</p></td>
+<td><p><strong>NannyML</strong></p></td>
+<td><p>Estima performance sin necesidad de ground truth con Confident Learning</p></td>
+</tr>
+<tr class="row-even"><td><p>Métricas de infraestructura</p></td>
+<td><p><strong>Prometheus + Grafana</strong></p></td>
+<td><p>Estándar de la industria; se integra con FastAPI vía <code class="docutils literal notranslate"><span class="pre">prometheus-fastapi-instrumentator</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Trazabilidad de experimentos</p></td>
+<td><p><strong>MLflow</strong></p></td>
+<td><p>Registra parámetros, métricas y artefactos; facilita comparar versiones de modelos</p></td>
+</tr>
+<tr class="row-even"><td><p>Feature Store</p></td>
+<td><p><strong>Feast</strong></p></td>
+<td><p>Consistencia de features entre entrenamiento y producción</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="frecuencia-de-re-entrenamiento-recomendada">
+<h3>Frecuencia de re-entrenamiento recomendada<a class="headerlink" href="#frecuencia-de-re-entrenamiento-recomendada" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Monitoreo continuo → Alerta de deriva → Re-entrenamiento con datos recientes (últimas 8 semanas)
+                  → Sin deriva      → Re-entrenamiento proactivo mensual
+</pre></div>
+</div>
+<p>El pipeline del Notebook 2 (incluyendo <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> y serialización con <code class="docutils literal notranslate"><span class="pre">joblib</span></code>) puede
+re-ejecutarse directamente con datos nuevos sin modificaciones.</p>
+</section>
+</section>
+<section id="conclusiones-del-monitoreo">
+<h2>3.8 Conclusiones del Monitoreo<a class="headerlink" href="#conclusiones-del-monitoreo" title="Permalink to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tipo de monitoreo</p></th>
+<th class="head"><p>Método</p></th>
+<th class="head"><p>Frecuencia</p></th>
+<th class="head"><p>Umbral de alerta</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Deriva numérica</p></td>
+<td><p>KS test (tenure, charges)</p></td>
+<td><p>Semanal</p></td>
+<td><p>p-valor &lt; 0.05</p></td>
+</tr>
+<tr class="row-odd"><td><p>Deriva categórica</p></td>
+<td><p>Chi-cuadrado (Contract, InternetService)</p></td>
+<td><p>Semanal</p></td>
+<td><p>p-valor &lt; 0.05</p></td>
+</tr>
+<tr class="row-even"><td><p>Rendimiento del modelo</p></td>
+<td><p>Rolling AUC (ventana=200)</p></td>
+<td><p>Continuo</p></td>
+<td><p>&lt; 0.8052 (−5%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Distribución de predicciones</p></td>
+<td><p>Churn rate predicho semanal</p></td>
+<td><p>Semanal</p></td>
+<td><p>&gt; 35%</p></td>
+</tr>
+<tr class="row-even"><td><p>Latencia del servicio</p></td>
+<td><p>P95 y P99</p></td>
+<td><p>Continuo</p></td>
+<td><p>P95 &gt; 500ms</p></td>
+</tr>
+<tr class="row-odd"><td><p>Disponibilidad</p></td>
+<td><p>Tasa de errores HTTP</p></td>
+<td><p>Continuo</p></td>
+<td><p>&gt; 5%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>El monitoreo proactivo garantiza que el modelo mantenga su capacidad predictiva
+(AUC-ROC ≈ 0.8476) y que el servicio FastAPI cumpla los SLA de latencia en producción.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="2_model_training.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">2. Preprocesamiento + Modelado con Pipelines y GridSearchCV</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importaciones">3.1 Importaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estrategia-de-monitoreo-vision-general">3.2 Estrategia de Monitoreo: Visión General</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriva-de-datos-data-drift">3.3 Deriva de Datos (Data Drift)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prueba-de-kolmogorov-smirnov-ks-variables-numericas">3.3.1 Prueba de Kolmogorov-Smirnov (KS) — Variables numéricas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prueba-chi-cuadrado-variables-categoricas">3.3.2 Prueba Chi-cuadrado — Variables categóricas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizacion-de-distribuciones-referencia-vs-produccion">3.3.3 Visualización de distribuciones (referencia vs producción)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriva-del-modelo-model-drift-concept-drift">3.4 Deriva del Modelo (Model Drift / Concept Drift)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ventana-deslizante-de-auc-roc-rolling-auc">3.4.1 Ventana deslizante de AUC-ROC (Rolling AUC)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-deriva-del-modelo">📋 Análisis — Deriva del modelo</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#monitoreo-de-distribucion-de-predicciones">3.5 Monitoreo de Distribución de Predicciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-de-produccion-del-servicio">3.6 Métricas de Producción del Servicio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plan-de-alertas-y-re-entrenamiento">3.7 Plan de Alertas y Re-entrenamiento</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#herramientas-recomendadas">Herramientas recomendadas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#frecuencia-de-re-entrenamiento-recomendada">Frecuencia de re-entrenamiento recomendada</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusiones-del-monitoreo">3.8 Conclusiones del Monitoreo</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By David Estrada
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

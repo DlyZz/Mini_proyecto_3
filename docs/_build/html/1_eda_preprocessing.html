@@ -1,0 +1,1586 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>1. EDA Telco Customer Churn &#8212; Mini proyecto 3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '1_eda_preprocessing';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. Preprocesamiento + Modelado con Pipelines y GridSearchCV" href="2_model_training.html" />
+    <link rel="prev" title="Welcome to your Jupyter Book" href="intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Mini proyecto 3 - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Mini proyecto 3 - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Welcome to your Jupyter Book
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">1. EDA  Telco Customer Churn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2_model_training.html">2. Preprocesamiento + Modelado con Pipelines y GridSearchCV</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3_monitoring_mlops.html">3. Monitoreo del Modelo en Producción — MLOps</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2F1_eda_preprocessing.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/1_eda_preprocessing.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1. EDA  Telco Customer Churn</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-librerias">1.1 Importación de librerías</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vista-general-del-dataset">1.3 Vista general del dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#valores-faltantes-y-limpieza-inicial">1.4 Valores faltantes y limpieza inicial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#desbalance-de-clases-variable-objetivo-churn">1.5 Desbalance de clases — Variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribucion-de-variables-numericas">1.6 Distribución de variables numéricas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribucion-de-variables-categoricas-vs-churn">1.7 Distribución de variables categóricas vs Churn</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-correlacion-variables-numericas">1.8 Matriz de correlación (variables numéricas)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-outliers-diagrama-de-caja-extendido">1.9 Análisis de outliers — Diagrama de caja extendido</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-servicios-contratados-vs-churn">1.10 Análisis de servicios contratados vs Churn</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perfil-de-cliente-resumen-del-eda">1.11 Perfil de cliente — Resumen del EDA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardar-dataset-limpio-para-el-siguiente-notebook">1.12 Guardar dataset limpio para el siguiente notebook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="eda-telco-customer-churn">
+<h1>1. EDA  Telco Customer Churn<a class="headerlink" href="#eda-telco-customer-churn" title="Permalink to this heading">#</a></h1>
+<section id="importacion-de-librerias">
+<h2>1.1 Importación de librerías<a class="headerlink" href="#importacion-de-librerias" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;whitegrid&#39;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;muted&#39;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">42</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/WA_Fn-UseC_-Telco-Customer-Churn.csv&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Shape: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Shape: (7043, 21)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>customerID</th>
+      <th>gender</th>
+      <th>SeniorCitizen</th>
+      <th>Partner</th>
+      <th>Dependents</th>
+      <th>tenure</th>
+      <th>PhoneService</th>
+      <th>MultipleLines</th>
+      <th>InternetService</th>
+      <th>OnlineSecurity</th>
+      <th>...</th>
+      <th>DeviceProtection</th>
+      <th>TechSupport</th>
+      <th>StreamingTV</th>
+      <th>StreamingMovies</th>
+      <th>Contract</th>
+      <th>PaperlessBilling</th>
+      <th>PaymentMethod</th>
+      <th>MonthlyCharges</th>
+      <th>TotalCharges</th>
+      <th>Churn</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>7590-VHVEG</td>
+      <td>Female</td>
+      <td>0</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>1</td>
+      <td>No</td>
+      <td>No phone service</td>
+      <td>DSL</td>
+      <td>No</td>
+      <td>...</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Month-to-month</td>
+      <td>Yes</td>
+      <td>Electronic check</td>
+      <td>29.85</td>
+      <td>29.85</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>5575-GNVDE</td>
+      <td>Male</td>
+      <td>0</td>
+      <td>No</td>
+      <td>No</td>
+      <td>34</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>DSL</td>
+      <td>Yes</td>
+      <td>...</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>One year</td>
+      <td>No</td>
+      <td>Mailed check</td>
+      <td>56.95</td>
+      <td>1889.5</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3668-QPYBK</td>
+      <td>Male</td>
+      <td>0</td>
+      <td>No</td>
+      <td>No</td>
+      <td>2</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>DSL</td>
+      <td>Yes</td>
+      <td>...</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Month-to-month</td>
+      <td>Yes</td>
+      <td>Mailed check</td>
+      <td>53.85</td>
+      <td>108.15</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>7795-CFOCW</td>
+      <td>Male</td>
+      <td>0</td>
+      <td>No</td>
+      <td>No</td>
+      <td>45</td>
+      <td>No</td>
+      <td>No phone service</td>
+      <td>DSL</td>
+      <td>Yes</td>
+      <td>...</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>One year</td>
+      <td>No</td>
+      <td>Bank transfer (automatic)</td>
+      <td>42.30</td>
+      <td>1840.75</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>9237-HQITU</td>
+      <td>Female</td>
+      <td>0</td>
+      <td>No</td>
+      <td>No</td>
+      <td>2</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Fiber optic</td>
+      <td>No</td>
+      <td>...</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Month-to-month</td>
+      <td>Yes</td>
+      <td>Electronic check</td>
+      <td>70.70</td>
+      <td>151.65</td>
+      <td>Yes</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 21 columns</p>
+</div></div></div>
+</div>
+<p>El dataset contiene <strong>7 043 registros y 21 columnas</strong>, incluyendo información demográfica del cliente (<code class="docutils literal notranslate"><span class="pre">gender</span></code>, <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">Partner</span></code>, <code class="docutils literal notranslate"><span class="pre">Dependents</span></code>), características del servicio (<code class="docutils literal notranslate"><span class="pre">PhoneService</span></code>, <code class="docutils literal notranslate"><span class="pre">InternetService</span></code>, <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, entre otras), variables de facturación (<code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>, <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>) y la variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code>.</p>
+<ul class="simple">
+<li><p>La columna <code class="docutils literal notranslate"><span class="pre">customerID</span></code> es un identificador único sin valor predictivo; se eliminará en el preprocesamiento.</p></li>
+<li><p>La columna <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> está almacenada como <code class="docutils literal notranslate"><span class="pre">object</span></code> a pesar de representar valores numéricos, lo que indica la presencia de caracteres no numéricos (espacios en blanco) que deben corregirse.</p></li>
+</ul>
+</section>
+<section id="vista-general-del-dataset">
+<h2>1.3 Vista general del dataset<a class="headerlink" href="#vista-general-del-dataset" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Tipos de variables ===&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Registros: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1"> | Columnas: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Tipos de variables ===
+customerID           object
+gender               object
+SeniorCitizen         int64
+Partner              object
+Dependents           object
+tenure                int64
+PhoneService         object
+MultipleLines        object
+InternetService      object
+OnlineSecurity       object
+OnlineBackup         object
+DeviceProtection     object
+TechSupport          object
+StreamingTV          object
+StreamingMovies      object
+Contract             object
+PaperlessBilling     object
+PaymentMethod        object
+MonthlyCharges      float64
+TotalCharges         object
+Churn                object
+dtype: object
+
+Registros: 7,043 | Columnas: 21
+</pre></div>
+</div>
+</div>
+</div>
+<p>El dataset combina <strong>variables de tres tipos</strong>:</p>
+<ul class="simple">
+<li><p><strong>Numéricas enteras</strong> (<code class="docutils literal notranslate"><span class="pre">int64</span></code>): <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code>.</p></li>
+<li><p><strong>Numéricas flotantes</strong> (<code class="docutils literal notranslate"><span class="pre">float64</span></code>): <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>, <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> (esta última requiere conversión explícita).</p></li>
+<li><p><strong>Categóricas</strong> (<code class="docutils literal notranslate"><span class="pre">object</span></code>): 15 columnas, incluyendo <code class="docutils literal notranslate"><span class="pre">gender</span></code>, <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, <code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code>, y todas las variables de servicios.</p></li>
+</ul>
+<p>Esta heterogeneidad exige el uso de un <code class="docutils literal notranslate"><span class="pre">ColumnTransformer</span></code> en el Pipeline para aplicar transformaciones diferenciadas a cada tipo de variable.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Estadísticas descriptivas — variables numéricas ===&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Estadísticas descriptivas — variables numéricas ===
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>SeniorCitizen</th>
+      <td>7043.0</td>
+      <td>0.162147</td>
+      <td>0.368612</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>tenure</th>
+      <td>7043.0</td>
+      <td>32.371149</td>
+      <td>24.559481</td>
+      <td>0.00</td>
+      <td>9.0</td>
+      <td>29.00</td>
+      <td>55.00</td>
+      <td>72.00</td>
+    </tr>
+    <tr>
+      <th>MonthlyCharges</th>
+      <td>7043.0</td>
+      <td>64.761692</td>
+      <td>30.090047</td>
+      <td>18.25</td>
+      <td>35.5</td>
+      <td>70.35</td>
+      <td>89.85</td>
+      <td>118.75</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tenure</span></code> varía entre 0 y 72 meses, con una distribución claramente bimodal (clientes muy nuevos y muy antiguos).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> y <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> tienen alta dispersión, lo que anticipa la presencia de outliers en planes premium.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code> es binaria (0/1), aunque está almacenada como entero; su media de 0.16 indica que solo el 16% de los clientes son adultos mayores.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Estadísticas descriptivas — variables categóricas ===&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Estadísticas descriptivas — variables categóricas ===
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>unique</th>
+      <th>top</th>
+      <th>freq</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>customerID</th>
+      <td>7043</td>
+      <td>7043</td>
+      <td>7590-VHVEG</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>gender</th>
+      <td>7043</td>
+      <td>2</td>
+      <td>Male</td>
+      <td>3555</td>
+    </tr>
+    <tr>
+      <th>Partner</th>
+      <td>7043</td>
+      <td>2</td>
+      <td>No</td>
+      <td>3641</td>
+    </tr>
+    <tr>
+      <th>Dependents</th>
+      <td>7043</td>
+      <td>2</td>
+      <td>No</td>
+      <td>4933</td>
+    </tr>
+    <tr>
+      <th>PhoneService</th>
+      <td>7043</td>
+      <td>2</td>
+      <td>Yes</td>
+      <td>6361</td>
+    </tr>
+    <tr>
+      <th>MultipleLines</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>No</td>
+      <td>3390</td>
+    </tr>
+    <tr>
+      <th>InternetService</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>Fiber optic</td>
+      <td>3096</td>
+    </tr>
+    <tr>
+      <th>OnlineSecurity</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>No</td>
+      <td>3498</td>
+    </tr>
+    <tr>
+      <th>OnlineBackup</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>No</td>
+      <td>3088</td>
+    </tr>
+    <tr>
+      <th>DeviceProtection</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>No</td>
+      <td>3095</td>
+    </tr>
+    <tr>
+      <th>TechSupport</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>No</td>
+      <td>3473</td>
+    </tr>
+    <tr>
+      <th>StreamingTV</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>No</td>
+      <td>2810</td>
+    </tr>
+    <tr>
+      <th>StreamingMovies</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>No</td>
+      <td>2785</td>
+    </tr>
+    <tr>
+      <th>Contract</th>
+      <td>7043</td>
+      <td>3</td>
+      <td>Month-to-month</td>
+      <td>3875</td>
+    </tr>
+    <tr>
+      <th>PaperlessBilling</th>
+      <td>7043</td>
+      <td>2</td>
+      <td>Yes</td>
+      <td>4171</td>
+    </tr>
+    <tr>
+      <th>PaymentMethod</th>
+      <td>7043</td>
+      <td>4</td>
+      <td>Electronic check</td>
+      <td>2365</td>
+    </tr>
+    <tr>
+      <th>TotalCharges</th>
+      <td>7043</td>
+      <td>6531</td>
+      <td></td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>Churn</th>
+      <td>7043</td>
+      <td>2</td>
+      <td>No</td>
+      <td>5174</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>El dataset contiene <strong>15 variables categóricas</strong>; la mayoría son binarias (Yes/No), excepto <code class="docutils literal notranslate"><span class="pre">InternetService</span></code> (DSL / Fiber optic / No), <code class="docutils literal notranslate"><span class="pre">Contract</span></code> (Month-to-month / One year / Two year) y <code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code> (4 categorías).</p></li>
+<li><p>La categoría más frecuente en <code class="docutils literal notranslate"><span class="pre">Contract</span></code> es <code class="docutils literal notranslate"><span class="pre">Month-to-month</span></code>, presente en más del 55% de los clientes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Electronic</span> <span class="pre">check</span></code> es el método de pago dominante (~34% de los clientes).</p></li>
+<li><p>Variables como <code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span></code>, <code class="docutils literal notranslate"><span class="pre">TechSupport</span></code> y <code class="docutils literal notranslate"><span class="pre">OnlineBackup</span></code> incluyen una tercera categoría <code class="docutils literal notranslate"><span class="pre">'No</span> <span class="pre">internet</span> <span class="pre">service'</span></code>, que es redundante con <code class="docutils literal notranslate"><span class="pre">InternetService</span> <span class="pre">=</span> <span class="pre">No</span></code> y deberá considerarse en la codificación.</p></li>
+</ul>
+</section>
+<section id="valores-faltantes-y-limpieza-inicial">
+<h2>1.4 Valores faltantes y limpieza inicial<a class="headerlink" href="#valores-faltantes-y-limpieza-inicial" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><p><strong>Nota:</strong> <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> se carga como <code class="docutils literal notranslate"><span class="pre">object</span></code> porque contiene espacios en blanco para clientes nuevos con <code class="docutils literal notranslate"><span class="pre">tenure=0</span></code>. Deben convertirse a numérico.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convertir TotalCharges a numérico (espacios → NaN)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+
+<span class="c1"># Eliminar columna identificadora</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;customerID&#39;</span><span class="p">])</span>
+
+<span class="c1"># Conteo de valores faltantes</span>
+<span class="n">missing</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">missing_pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">missing</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">missing_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Faltantes&#39;</span><span class="p">:</span> <span class="n">missing</span><span class="p">,</span> <span class="s1">&#39;Porcentaje (%)&#39;</span><span class="p">:</span> <span class="n">missing_pct</span><span class="p">})</span>
+<span class="n">missing_df</span> <span class="o">=</span> <span class="n">missing_df</span><span class="p">[</span><span class="n">missing_df</span><span class="p">[</span><span class="s1">&#39;Faltantes&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Valores faltantes ===&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">missing_df</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">missing_df</span><span class="o">.</span><span class="n">empty</span> <span class="k">else</span> <span class="s1">&#39;No se detectaron valores faltantes.&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Total filas con al menos un NaN: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Valores faltantes ===
+              Faltantes  Porcentaje (%)
+TotalCharges         11            0.16
+
+Total filas con al menos un NaN: 11
+</pre></div>
+</div>
+</div>
+</div>
+<p>Se detectaron <strong>11 valores faltantes (0.16%)</strong>, todos en la columna <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>. Al convertir la columna a numérico con <code class="docutils literal notranslate"><span class="pre">pd.to_numeric(...,</span> <span class="pre">errors='coerce')</span></code>, los espacios en blanco originales se transformaron en <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
+<p><strong>Causa:</strong> estos 11 registros corresponden a clientes con <code class="docutils literal notranslate"><span class="pre">tenure</span> <span class="pre">=</span> <span class="pre">0</span></code>, es decir, clientes que aún no han recibido su primera factura. Por lo tanto, un <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> de cero o nulo es coherente con su historial.</p>
+<p><strong>Decisión de imputación:</strong> se imputará con la <strong>mediana</strong> de <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> dentro del Pipeline, usando <code class="docutils literal notranslate"><span class="pre">SimpleImputer(strategy='median')</span></code>. La mediana es preferible a la media en presencia de distribuciones sesgadas o outliers.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualización de valores faltantes</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">cols_missing</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">cols_missing</span><span class="p">:</span>
+    <span class="n">pcts</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">cols_missing</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">cols_missing</span><span class="p">,</span> <span class="n">pcts</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#e07b54&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">% d</span><span class="s1">e valores faltantes&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Columnas con valores faltantes&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">pcts</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">val</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;Sin valores faltantes detectados&#39;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_missing.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/0bddfb4e7ba437b32ca604c6e614f27ec7b989c09147c68fba51cf7cc20b7f12.png" src="_images/0bddfb4e7ba437b32ca604c6e614f27ec7b989c09147c68fba51cf7cc20b7f12.png" />
+</div>
+</div>
+<p>La figura confirma que <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> es la <strong>única columna con valores faltantes</strong>, con un porcentaje de <strong>0.16%</strong> (11 filas sobre 7 043). Este porcentaje es lo suficientemente bajo como para justificar imputación en lugar de eliminación de filas, lo que preservaría el 99.84% de la información disponible.</p>
+</section>
+<section id="desbalance-de-clases-variable-objetivo-churn">
+<h2>1.5 Desbalance de clases — Variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code><a class="headerlink" href="#desbalance-de-clases-variable-objetivo-churn" title="Permalink to this heading">#</a></h2>
+<p>El desbalance de clases es un factor crítico en la predicción de churn: si el modelo simplemente predice siempre “No churn”, puede tener alta exactitud pero pésimo recall. Es importante cuantificarlo antes de modelar.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convertir Churn a binario (0/1)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="s1">&#39;Yes&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;No&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+
+<span class="n">churn_counts</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<span class="n">churn_pct</span>    <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Distribución de la variable objetivo ===&#39;</span><span class="p">)</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;Clase&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;No Churn (0)&#39;</span><span class="p">,</span> <span class="s1">&#39;Churn (1)&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;Conteo&#39;</span><span class="p">:</span> <span class="n">churn_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="s1">&#39;Porcentaje (%)&#39;</span><span class="p">:</span> <span class="n">churn_pct</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">churn_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">churn_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Ratio de desbalance (No Churn / Churn): </span><span class="si">{</span><span class="n">ratio</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">:1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Distribución de la variable objetivo ===
+       Clase  Conteo  Porcentaje (%)
+No Churn (0)    5174           73.46
+   Churn (1)    1869           26.54
+
+Ratio de desbalance (No Churn / Churn): 2.77:1
+</pre></div>
+</div>
+</div>
+</div>
+<p>El <strong>ratio de desbalance es de 2.77:1</strong>, lo que significa que por cada cliente que abandona hay aproximadamente 3 que permanecen. Este desbalance es <strong>moderado</strong> (no extremo), pero suficiente para distorsionar la evaluación si se usa únicamente la métrica de <code class="docutils literal notranslate"><span class="pre">accuracy</span></code>.</p>
+<p><strong>Implicaciones para el modelado:</strong></p>
+<ul class="simple">
+<li><p>Usar <code class="docutils literal notranslate"><span class="pre">class_weight='balanced'</span></code> en Random Forest y LightGBM.</p></li>
+<li><p>Usar <code class="docutils literal notranslate"><span class="pre">scale_pos_weight</span> <span class="pre">=</span> <span class="pre">2.77</span></code> en XGBoost.</p></li>
+<li><p>Usar <code class="docutils literal notranslate"><span class="pre">auto_class_weights='Balanced'</span></code> en CatBoost.</p></li>
+<li><p>Priorizar <strong>F1-score</strong> y <strong>AUC-ROC</strong> como métricas de evaluación principales.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Gráfico de barras</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="s1">&#39;#E05C5C&#39;</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;No Churn&#39;</span><span class="p">,</span> <span class="s1">&#39;Churn&#39;</span><span class="p">]</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">churn_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">pct</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">churn_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">churn_pct</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">+</span> <span class="mi">60</span><span class="p">,</span>
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cnt</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="se">\n</span><span class="s1">(</span><span class="si">{</span><span class="n">pct</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">%)&#39;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Distribución de clases&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Número de clientes&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">churn_counts</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">FuncFormatter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
+
+<span class="c1"># Gráfico de torta</span>
+<span class="n">wedges</span><span class="p">,</span> <span class="n">texts</span><span class="p">,</span> <span class="n">autotexts</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span>
+    <span class="n">churn_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+    <span class="n">autopct</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%1.1f%%</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">startangle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+    <span class="n">wedgeprops</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;edgecolor&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">autotexts</span><span class="p">:</span>
+    <span class="n">at</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">at</span><span class="o">.</span><span class="n">set_fontweight</span><span class="p">(</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Proporción de clases&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Desbalance de clases — Variable Churn&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_churn_balance.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/c820f1e719924df3caff0c5cd106625a189abb370b18aa1be87b51ad28b00b7e.png" src="_images/c820f1e719924df3caff0c5cd106625a189abb370b18aa1be87b51ad28b00b7e.png" />
+</div>
+</div>
+<p>El gráfico de barras y el diagrama de torta confirman el desbalance: la clase <code class="docutils literal notranslate"><span class="pre">Churn</span> <span class="pre">=</span> <span class="pre">1</span></code> representa solo el <strong>26.5% del total</strong>. Un clasificador que predijera siempre “No Churn” obtendría una exactitud del 73.5%, lo que ilustra por qué <code class="docutils literal notranslate"><span class="pre">accuracy</span></code> es una métrica engañosa en este problema.</p>
+</section>
+<section id="distribucion-de-variables-numericas">
+<h2>1.6 Distribución de variables numéricas<a class="headerlink" href="#distribucion-de-variables-numericas" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;Churn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variables numéricas: </span><span class="si">{</span><span class="n">num_cols</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">num_cols</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_cols</span><span class="p">)</span> <span class="o">*</span> <span class="mf">3.5</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
+    <span class="c1"># Histograma por clase</span>
+    <span class="k">for</span> <span class="n">churn_val</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="s1">&#39;#E05C5C&#39;</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="s1">&#39;No Churn&#39;</span><span class="p">,</span> <span class="s1">&#39;Churn&#39;</span><span class="p">]):</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">churn_val</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span>
+                         <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+                         <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1"> — distribución por clase&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Densidad&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="c1"># Boxplot por clase</span>
+    <span class="n">data_plot</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span>
+                 <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()]</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data_plot</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;No Churn&#39;</span><span class="p">,</span> <span class="s1">&#39;Churn&#39;</span><span class="p">],</span>
+                              <span class="n">patch_artist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">notch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                              <span class="n">medianprops</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+    <span class="k">for</span> <span class="n">patch</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bp</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="s1">&#39;#E05C5C&#39;</span><span class="p">]):</span>
+        <span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+        <span class="n">patch</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1"> — boxplot por clase&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+    <span class="c1"># Prueba t de Student para diferencia de medias</span>
+    <span class="n">g0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">g1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">t_stat</span><span class="p">,</span> <span class="n">p_val</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">g0</span><span class="p">,</span> <span class="n">g1</span><span class="p">,</span> <span class="n">equal_var</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="s1">&#39;✓ Significativa&#39;</span> <span class="k">if</span> <span class="n">p_val</span> <span class="o">&lt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s1">&#39;✗ No significativa&#39;</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;p=</span><span class="si">{</span><span class="n">p_val</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">sig</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                    <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#2d6a2d&#39;</span> <span class="k">if</span> <span class="n">p_val</span> <span class="o">&lt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s1">&#39;#8b1c1c&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Distribución de variables numéricas según Churn&#39;</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.001</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_num_distributions.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Variables numéricas: [&#39;SeniorCitizen&#39;, &#39;tenure&#39;, &#39;MonthlyCharges&#39;, &#39;TotalCharges&#39;]
+</pre></div>
+</div>
+<img alt="_images/0da4436673abbb799031b2782860d57252564b2b5240fd97f1a4e3ec6473dc5f.png" src="_images/0da4436673abbb799031b2782860d57252564b2b5240fd97f1a4e3ec6473dc5f.png" />
+</div>
+</div>
+<p>Las <strong>4 variables numéricas</strong> identificadas son: <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code>, <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> y <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">tenure</span></code> (antigüedad en meses):</strong></p>
+<ul class="simple">
+<li><p>Churn=1: media = 17.98 meses, mediana = 10 meses.</p></li>
+<li><p>Churn=0: media = 37.57 meses, mediana = 38 meses.</p></li>
+<li><p>La diferencia es <strong>estadísticamente significativa</strong> (prueba t, p &lt; 0.05). Los clientes que abandonan tienen una antigüedad notablemente menor, lo que sugiere que los primeros meses son el periodo crítico de fidelización.</p></li>
+</ul>
+<p><strong><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> (cargo mensual):</strong></p>
+<ul class="simple">
+<li><p>Churn=1: media = $74.44, mediana = $79.65.</p></li>
+<li><p>Churn=0: media = $61.27, mediana = $64.43.</p></li>
+<li><p>Los clientes que hacen churn pagan en promedio <strong>$13 más al mes</strong>, lo que podría indicar que perciben menor valor por el costo del servicio.</p></li>
+</ul>
+<p><strong><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> (cargos totales acumulados):</strong></p>
+<ul class="simple">
+<li><p>Churn=1: media = $1 531, mediana = $703.</p></li>
+<li><p>Churn=0: media = $2 555, mediana = $1 683.</p></li>
+<li><p>Los clientes que no hacen churn han acumulado más cargos totales, coherente con su mayor antigüedad.</p></li>
+</ul>
+<p><strong><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>:</strong></p>
+<ul class="simple">
+<li><p>Churn=1: media = 0.25 (25% son adultos mayores).</p></li>
+<li><p>Churn=0: media = 0.13 (13% son adultos mayores).</p></li>
+<li><p>Los adultos mayores tienen <strong>el doble de tasa de churn</strong>, posiblemente por menor adopción tecnológica o mayor sensibilidad al precio.</p></li>
+</ul>
+</section>
+<section id="distribucion-de-variables-categoricas-vs-churn">
+<h2>1.7 Distribución de variables categóricas vs Churn<a class="headerlink" href="#distribucion-de-variables-categoricas-vs-churn" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cat_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variables categóricas: </span><span class="si">{</span><span class="n">cat_cols</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">n_cols</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n_rows</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cat_cols</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">n_cols</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cat_cols</span><span class="p">):</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">],</span> <span class="n">normalize</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">ct</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;No Churn&#39;</span><span class="p">,</span> <span class="s1">&#39;Churn&#39;</span><span class="p">]</span>
+    <span class="n">ct</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="s1">&#39;#E05C5C&#39;</span><span class="p">],</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.65</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">% d</span><span class="s1">entro de la categoría&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Churn&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">FuncFormatter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">containers</span><span class="p">:</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">bar_label</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%.0f%%</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mf">7.5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Ocultar ejes sobrantes</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)):</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Tasa de Churn (%) por categoría de cada variable&#39;</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_cat_churn_rates.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Variables categóricas: [&#39;gender&#39;, &#39;Partner&#39;, &#39;Dependents&#39;, &#39;PhoneService&#39;, &#39;MultipleLines&#39;, &#39;InternetService&#39;, &#39;OnlineSecurity&#39;, &#39;OnlineBackup&#39;, &#39;DeviceProtection&#39;, &#39;TechSupport&#39;, &#39;StreamingTV&#39;, &#39;StreamingMovies&#39;, &#39;Contract&#39;, &#39;PaperlessBilling&#39;, &#39;PaymentMethod&#39;]
+</pre></div>
+</div>
+<img alt="_images/3496c330e5bc81b7b5bc8da664fd9f5e1ed4fd6305053fcbf54cfc26ac97b1a7.png" src="_images/3496c330e5bc81b7b5bc8da664fd9f5e1ed4fd6305053fcbf54cfc26ac97b1a7.png" />
+</div>
+</div>
+<p>Las <strong>15 variables categóricas</strong> muestran diferencias relevantes en la tasa de churn entre sus categorías:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Contract</span></code>:</strong> es la variable más discriminante. Los clientes con contrato <code class="docutils literal notranslate"><span class="pre">Month-to-month</span></code> presentan una tasa de churn de ~43%, frente al ~11% en contratos de un año y ~3% en contratos de dos años. El tipo de contrato es el predictor categórico más fuerte del dataset.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code>:</strong> los clientes que pagan con <code class="docutils literal notranslate"><span class="pre">Electronic</span> <span class="pre">check</span></code> tienen la mayor tasa de churn (~45%), mientras que los métodos de pago automático (tarjeta de crédito, transferencia bancaria) presentan tasas inferiores al 20%.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">InternetService</span></code>:</strong> los clientes con <code class="docutils literal notranslate"><span class="pre">Fiber</span> <span class="pre">optic</span></code> hacen churn a una tasa ~42%, frente a ~19% para DSL y ~7% para los que no tienen internet, lo que podría reflejar insatisfacción con la relación calidad-precio de la fibra.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span></code> y <code class="docutils literal notranslate"><span class="pre">TechSupport</span></code>:</strong> clientes sin estos servicios presentan tasas de churn aproximadamente el doble que quienes sí los tienen, lo que sugiere su efecto retenedor.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">gender</span></code>:</strong> prácticamente no diferencia la tasa de churn (~26% en ambos géneros). Variable con bajo poder predictivo.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">PaperlessBilling</span></code>:</strong> los clientes con facturación electrónica muestran mayor tasa de churn (~34%) que los de facturación física (~16%), posiblemente por correlación con contratos mensuales y Electronic check.</p></li>
+</ul>
+</section>
+<section id="matriz-de-correlacion-variables-numericas">
+<h2>1.8 Matriz de correlación (variables numéricas)<a class="headerlink" href="#matriz-de-correlacion-variables-numericas" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">num_cols</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">num_df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+    <span class="n">corr_matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span>
+    <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">annot_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Matriz de correlación — variables numéricas + Churn&#39;</span><span class="p">,</span>
+             <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_correlation.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Correlación con Churn ordenada</span>
+<span class="n">churn_corr</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;Churn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">abs</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Correlación con Churn (valor absoluto desc.) ===&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">churn_corr</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/a1a13ba8d2583e111e9c4892a360e272d2473c79feea0b89188384b481136ecb.png" src="_images/a1a13ba8d2583e111e9c4892a360e272d2473c79feea0b89188384b481136ecb.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Correlación con Churn (valor absoluto desc.) ===
+tenure           -0.352229
+TotalCharges     -0.199484
+MonthlyCharges    0.193356
+SeniorCitizen     0.150889
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tenure</span></code> tiene la correlación negativa más fuerte: a mayor antigüedad, menor probabilidad de churn.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> tiene correlación positiva: a mayor cargo mensual, mayor probabilidad de churn.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> presenta alta correlación con <code class="docutils literal notranslate"><span class="pre">tenure</span></code> (r ≈ 0.83), lo que indica <strong>multicolinealidad</strong> entre ambas variables. Esto no afecta a los modelos de árbol, pero es importante considerarlo si se usaran modelos lineales o regresión logística.</p></li>
+<li><p>Ninguna correlación supera 0.40 en valor absoluto, lo que confirma que el problema requiere modelos no lineales para capturar relaciones más complejas.</p></li>
+</ul>
+</section>
+<section id="analisis-de-outliers-diagrama-de-caja-extendido">
+<h2>1.9 Análisis de outliers — Diagrama de caja extendido<a class="headerlink" href="#analisis-de-outliers-diagrama-de-caja-extendido" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_cols</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_cols</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">):</span>
+    <span class="n">q1</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+    <span class="n">q3</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">iqr</span> <span class="o">=</span> <span class="n">q3</span> <span class="o">-</span> <span class="n">q1</span>
+    <span class="n">n_outliers</span> <span class="o">=</span> <span class="p">((</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">q1</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">q3</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">patch_artist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">medianprops</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;#333&#39;</span><span class="p">,</span> <span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                    <span class="n">flierprops</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;marker&#39;</span><span class="p">:</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;markersize&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                                <span class="s1">&#39;markerfacecolor&#39;</span><span class="p">:</span> <span class="s1">&#39;#E05C5C&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">})</span>
+    <span class="n">bp</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">)</span>
+    <span class="n">bp</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n_outliers</span><span class="si">}</span><span class="s1"> outliers IQR&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Outliers por variable numérica (criterio IQR)&#39;</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_outliers.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/1b21060b964a4fd92033484fc73bf209b71050a8e5c23bba386abe303e229132.png" src="_images/1b21060b964a4fd92033484fc73bf209b71050a8e5c23bba386abe303e229132.png" />
+</div>
+</div>
+<p>Aplicando el criterio IQR (valores fuera del rango [Q1 − 1.5·IQR, Q3 + 1.5·IQR]):</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>:</strong> presenta outliers en valores extremos bajos (planes muy básicos) y altos (planes premium). La distribución es relativamente uniforme entre $20 y $100.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>:</strong> outliers en la zona superior, correspondientes a clientes con alta antigüedad y planes costosos. Su distribución es fuertemente sesgada a la derecha.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">tenure</span></code>:</strong> sin outliers relevantes; los valores extremos (0 y 72) son límites naturales del negocio.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>:</strong> binaria, no aplica análisis de outliers.</p></li>
+</ul>
+</section>
+<section id="analisis-de-servicios-contratados-vs-churn">
+<h2>1.10 Análisis de servicios contratados vs Churn<a class="headerlink" href="#analisis-de-servicios-contratados-vs-churn" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">service_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PhoneService&#39;</span><span class="p">,</span> <span class="s1">&#39;MultipleLines&#39;</span><span class="p">,</span> <span class="s1">&#39;InternetService&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;OnlineSecurity&#39;</span><span class="p">,</span> <span class="s1">&#39;OnlineBackup&#39;</span><span class="p">,</span> <span class="s1">&#39;DeviceProtection&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;TechSupport&#39;</span><span class="p">,</span> <span class="s1">&#39;StreamingTV&#39;</span><span class="p">,</span> <span class="s1">&#39;StreamingMovies&#39;</span><span class="p">]</span>
+
+<span class="c1"># Tasa de churn para cada servicio (cuando lo tiene vs cuando no)</span>
+<span class="n">churn_rates</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">service_cols</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">rates</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">col</span><span class="p">)[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">churn_rates</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">rates</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">churn_rate_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">churn_rates</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="c1"># Mostrar solo Yes vs No si existen</span>
+<span class="k">if</span> <span class="s1">&#39;Yes&#39;</span> <span class="ow">in</span> <span class="n">churn_rate_df</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="s1">&#39;No&#39;</span> <span class="ow">in</span> <span class="n">churn_rate_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">churn_rate_df</span><span class="p">[[</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;barh&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="s1">&#39;#E05C5C&#39;</span><span class="p">],</span>
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.65</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Tasa de Churn (%)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Tasa de Churn por servicio contratado (Sí / No)&#39;</span><span class="p">,</span>
+                 <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Sin servicio&#39;</span><span class="p">,</span> <span class="s1">&#39;Con servicio&#39;</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">FuncFormatter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;fig_services_churn.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/cca69713b7c007045eabef514892cf215122d3b9f09c1c8286a3bf5bc5010d45.png" src="_images/cca69713b7c007045eabef514892cf215122d3b9f09c1c8286a3bf5bc5010d45.png" />
+</div>
+</div>
+<p>El análisis de los 9 servicios disponibles revela patrones claros de retención y riesgo:</p>
+<p><strong>Servicios protectores (menor tasa de churn al tenerlos):</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span></code>: clientes sin este servicio tienen tasa de churn ~42%; con el servicio, ~15%.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TechSupport</span></code>: patrón similar; el soporte técnico reduce significativamente el abandono.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OnlineBackup</span></code> y <code class="docutils literal notranslate"><span class="pre">DeviceProtection</span></code>: efecto protector moderado.</p></li>
+</ul>
+<p><strong>Servicios sin efecto diferenciador:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">StreamingTV</span></code> y <code class="docutils literal notranslate"><span class="pre">StreamingMovies</span></code>: tasas de churn similares entre quienes tienen y no tienen el servicio (~30%).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PhoneService</span></code> y <code class="docutils literal notranslate"><span class="pre">MultipleLines</span></code>: impacto mínimo en la tasa de churn.</p></li>
+</ul>
+</section>
+<section id="perfil-de-cliente-resumen-del-eda">
+<h2>1.11 Perfil de cliente — Resumen del EDA<a class="headerlink" href="#perfil-de-cliente-resumen-del-eda" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Perfil del cliente con mayor riesgo de Churn ===&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">high_risk</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">low_risk</span>  <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">num_cols</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Churn=1  → media=</span><span class="si">{</span><span class="n">high_risk</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, mediana=</span><span class="si">{</span><span class="n">high_risk</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Churn=0  → media=</span><span class="si">{</span><span class="n">low_risk</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">,  mediana=</span><span class="si">{</span><span class="n">low_risk</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">=== Tipo de contrato más frecuente en Churn=1 ===&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">high_risk</span><span class="p">[</span><span class="s1">&#39;Contract&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">=== Método de pago más frecuente en Churn=1 ===&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">high_risk</span><span class="p">[</span><span class="s1">&#39;PaymentMethod&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Perfil del cliente con mayor riesgo de Churn ===
+--------------------------------------------------
+SeniorCitizen:
+  Churn=1  → media=0.25, mediana=0.00
+  Churn=0  → media=0.13,  mediana=0.00
+tenure:
+  Churn=1  → media=17.98, mediana=10.00
+  Churn=0  → media=37.57,  mediana=38.00
+MonthlyCharges:
+  Churn=1  → media=74.44, mediana=79.65
+  Churn=0  → media=61.27,  mediana=64.43
+TotalCharges:
+  Churn=1  → media=1531.80, mediana=703.55
+  Churn=0  → media=2555.34,  mediana=1683.60
+
+=== Tipo de contrato más frecuente en Churn=1 ===
+Contract
+Month-to-month    88.6
+One year           8.9
+Two year           2.6
+
+=== Método de pago más frecuente en Churn=1 ===
+PaymentMethod
+Electronic check             57.3
+Mailed check                 16.5
+Bank transfer (automatic)    13.8
+Credit card (automatic)      12.4
+</pre></div>
+</div>
+</div>
+</div>
+<p>Con base en los datos observados, el <strong>perfil típico de un cliente que hace churn</strong> es:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Característica</p></th>
+<th class="head"><p>Valor típico</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Tipo de contrato</p></td>
+<td><p>Month-to-month (88.6% de los casos de churn)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Método de pago</p></td>
+<td><p>Electronic check (57.3% de los casos de churn)</p></td>
+</tr>
+<tr class="row-even"><td><p>Antigüedad (<code class="docutils literal notranslate"><span class="pre">tenure</span></code>)</p></td>
+<td><p>Media: 18 meses, mediana: 10 meses</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cargo mensual</p></td>
+<td><p>Media: $74.44, mediana: $79.65</p></td>
+</tr>
+<tr class="row-even"><td><p>Cargos totales</p></td>
+<td><p>Media: $1 531 (bajo por corta antigüedad)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Adulto mayor</p></td>
+<td><p>25% son <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span> <span class="pre">=</span> <span class="pre">1</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>En contraste, el <strong>cliente fidelizado</strong> (Churn=0) tiene una antigüedad media de 37.6 meses, paga $13 menos al mes en promedio, y predominantemente tiene contratos anuales o bianuales con métodos de pago automáticos.</p>
+<p>Este perfil permite orientar las estrategias de intervención hacia clientes recientes con contrato mensual, facturación electrónica y sin servicios de seguridad contratados.</p>
+</section>
+<section id="guardar-dataset-limpio-para-el-siguiente-notebook">
+<h2>1.12 Guardar dataset limpio para el siguiente notebook<a class="headerlink" href="#guardar-dataset-limpio-para-el-siguiente-notebook" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imputar TotalCharges (NaN → mediana)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">())</span>
+
+<span class="c1"># Verificación final</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;NaN restantes:&#39;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Shape final:&#39;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Distribución Churn:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Churn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+
+<span class="c1"># Guardar</span>
+<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;data/telco_churn_clean.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Dataset limpio guardado en ../data/telco_churn_clean.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NaN restantes: 0
+Shape final: (7043, 20)
+Distribución Churn:
+Churn
+0    5174
+1    1869
+Name: count, dtype: int64
+
+Dataset limpio guardado en ../data/telco_churn_clean.csv
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Welcome to your Jupyter Book</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="2_model_training.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">2. Preprocesamiento + Modelado con Pipelines y GridSearchCV</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-librerias">1.1 Importación de librerías</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vista-general-del-dataset">1.3 Vista general del dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#valores-faltantes-y-limpieza-inicial">1.4 Valores faltantes y limpieza inicial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#desbalance-de-clases-variable-objetivo-churn">1.5 Desbalance de clases — Variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribucion-de-variables-numericas">1.6 Distribución de variables numéricas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribucion-de-variables-categoricas-vs-churn">1.7 Distribución de variables categóricas vs Churn</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-correlacion-variables-numericas">1.8 Matriz de correlación (variables numéricas)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-outliers-diagrama-de-caja-extendido">1.9 Análisis de outliers — Diagrama de caja extendido</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-servicios-contratados-vs-churn">1.10 Análisis de servicios contratados vs Churn</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perfil-de-cliente-resumen-del-eda">1.11 Perfil de cliente — Resumen del EDA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardar-dataset-limpio-para-el-siguiente-notebook">1.12 Guardar dataset limpio para el siguiente notebook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By David Estrada
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
