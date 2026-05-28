@@ -66,7 +66,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="2. Preprocesamiento + Modelado con Pipelines y GridSearchCV" href="2_model_training.html" />
-    <link rel="prev" title="Welcome to your Jupyter Book" href="intro.html" />
+    <link rel="prev" title="Predicción de Churn en Telecomunicaciones" href="intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -169,14 +169,13 @@ const thebe_selector_output = ".output, .cell_output"
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="intro.html">
-                    Welcome to your Jupyter Book
+                    Predicción de Churn en Telecomunicaciones
                 </a>
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">1. EDA  Telco Customer Churn</a></li>
 <li class="toctree-l1"><a class="reference internal" href="2_model_training.html">2. Preprocesamiento + Modelado con Pipelines y GridSearchCV</a></li>
-<li class="toctree-l1"><a class="reference internal" href="3_monitoring_mlops.html">3. Monitoreo del Modelo en Producción — MLOps</a></li>
 </ul>
 
     </div>
@@ -595,11 +594,7 @@ document.write(`
 <p>5 rows × 21 columns</p>
 </div></div></div>
 </div>
-<p>El dataset contiene <strong>7 043 registros y 21 columnas</strong>, incluyendo información demográfica del cliente (<code class="docutils literal notranslate"><span class="pre">gender</span></code>, <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">Partner</span></code>, <code class="docutils literal notranslate"><span class="pre">Dependents</span></code>), características del servicio (<code class="docutils literal notranslate"><span class="pre">PhoneService</span></code>, <code class="docutils literal notranslate"><span class="pre">InternetService</span></code>, <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, entre otras), variables de facturación (<code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>, <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>) y la variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code>.</p>
-<ul class="simple">
-<li><p>La columna <code class="docutils literal notranslate"><span class="pre">customerID</span></code> es un identificador único sin valor predictivo; se eliminará en el preprocesamiento.</p></li>
-<li><p>La columna <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> está almacenada como <code class="docutils literal notranslate"><span class="pre">object</span></code> a pesar de representar valores numéricos, lo que indica la presencia de caracteres no numéricos (espacios en blanco) que deben corregirse.</p></li>
-</ul>
+<p>El dataset contiene 7 043 registros y 21 columnas, incluyendo información demográfica del cliente (<code class="docutils literal notranslate"><span class="pre">gender</span></code>, <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">Partner</span></code>, <code class="docutils literal notranslate"><span class="pre">Dependents</span></code>), características del servicio (<code class="docutils literal notranslate"><span class="pre">PhoneService</span></code>, <code class="docutils literal notranslate"><span class="pre">InternetService</span></code>, <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, entre otras), variables de facturación (<code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>, <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>) y la variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code>.</p>
 </section>
 <section id="vista-general-del-dataset">
 <h2>1.3 Vista general del dataset<a class="headerlink" href="#vista-general-del-dataset" title="Permalink to this heading">#</a></h2>
@@ -641,13 +636,12 @@ Registros: 7,043 | Columnas: 21
 </div>
 </div>
 </div>
-<p>El dataset combina <strong>variables de tres tipos</strong>:</p>
+<p>El dataset combina variables de tres tipos:</p>
 <ul class="simple">
-<li><p><strong>Numéricas enteras</strong> (<code class="docutils literal notranslate"><span class="pre">int64</span></code>): <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code>.</p></li>
-<li><p><strong>Numéricas flotantes</strong> (<code class="docutils literal notranslate"><span class="pre">float64</span></code>): <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>, <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> (esta última requiere conversión explícita).</p></li>
-<li><p><strong>Categóricas</strong> (<code class="docutils literal notranslate"><span class="pre">object</span></code>): 15 columnas, incluyendo <code class="docutils literal notranslate"><span class="pre">gender</span></code>, <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, <code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code>, y todas las variables de servicios.</p></li>
+<li><p>Numéricas enteras (<code class="docutils literal notranslate"><span class="pre">int64</span></code>): <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code>.</p></li>
+<li><p>Numéricas flotantes (<code class="docutils literal notranslate"><span class="pre">float64</span></code>): <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>, <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> (esta última requiere conversión explícita).</p></li>
+<li><p>Categóricas (<code class="docutils literal notranslate"><span class="pre">object</span></code>): 15 columnas, incluyendo <code class="docutils literal notranslate"><span class="pre">gender</span></code>, <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, <code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code>, y todas las variables de servicios.</p></li>
 </ul>
-<p>Esta heterogeneidad exige el uso de un <code class="docutils literal notranslate"><span class="pre">ColumnTransformer</span></code> en el Pipeline para aplicar transformaciones diferenciadas a cada tipo de variable.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Estadísticas descriptivas — variables numéricas ===&#39;</span><span class="p">)</span>
@@ -725,11 +719,6 @@ Registros: 7,043 | Columnas: 21
 </table>
 </div></div></div>
 </div>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">tenure</span></code> varía entre 0 y 72 meses, con una distribución claramente bimodal (clientes muy nuevos y muy antiguos).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> y <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> tienen alta dispersión, lo que anticipa la presencia de outliers en planes premium.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code> es binaria (0/1), aunque está almacenada como entero; su media de 0.16 indica que solo el 16% de los clientes son adultos mayores.</p></li>
-</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== Estadísticas descriptivas — variables categóricas ===&#39;</span><span class="p">)</span>
@@ -905,18 +894,12 @@ Registros: 7,043 | Columnas: 21
 </section>
 <section id="valores-faltantes-y-limpieza-inicial">
 <h2>1.4 Valores faltantes y limpieza inicial<a class="headerlink" href="#valores-faltantes-y-limpieza-inicial" title="Permalink to this heading">#</a></h2>
-<blockquote>
-<div><p><strong>Nota:</strong> <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> se carga como <code class="docutils literal notranslate"><span class="pre">object</span></code> porque contiene espacios en blanco para clientes nuevos con <code class="docutils literal notranslate"><span class="pre">tenure=0</span></code>. Deben convertirse a numérico.</p>
-</div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convertir TotalCharges a numérico (espacios → NaN)</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TotalCharges&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
 
-<span class="c1"># Eliminar columna identificadora</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;customerID&#39;</span><span class="p">])</span>
 
-<span class="c1"># Conteo de valores faltantes</span>
 <span class="n">missing</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="n">missing_pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">missing</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">missing_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Faltantes&#39;</span><span class="p">:</span> <span class="n">missing</span><span class="p">,</span> <span class="s1">&#39;Porcentaje (%)&#39;</span><span class="p">:</span> <span class="n">missing_pct</span><span class="p">})</span>
@@ -938,9 +921,9 @@ Total filas con al menos un NaN: 11
 </div>
 </div>
 </div>
-<p>Se detectaron <strong>11 valores faltantes (0.16%)</strong>, todos en la columna <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>. Al convertir la columna a numérico con <code class="docutils literal notranslate"><span class="pre">pd.to_numeric(...,</span> <span class="pre">errors='coerce')</span></code>, los espacios en blanco originales se transformaron en <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
-<p><strong>Causa:</strong> estos 11 registros corresponden a clientes con <code class="docutils literal notranslate"><span class="pre">tenure</span> <span class="pre">=</span> <span class="pre">0</span></code>, es decir, clientes que aún no han recibido su primera factura. Por lo tanto, un <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> de cero o nulo es coherente con su historial.</p>
-<p><strong>Decisión de imputación:</strong> se imputará con la <strong>mediana</strong> de <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> dentro del Pipeline, usando <code class="docutils literal notranslate"><span class="pre">SimpleImputer(strategy='median')</span></code>. La mediana es preferible a la media en presencia de distribuciones sesgadas o outliers.</p>
+<p>Se detectaron 11 valores faltantes (0.16%), todos en la columna <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>. Al convertir la columna a numérico con <code class="docutils literal notranslate"><span class="pre">pd.to_numeric(...,</span> <span class="pre">errors='coerce')</span></code>, los espacios en blanco originales se transformaron en <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
+<p>Causa: estos 11 registros corresponden a clientes con <code class="docutils literal notranslate"><span class="pre">tenure</span> <span class="pre">=</span> <span class="pre">0</span></code>, es decir, clientes que aún no han recibido su primera factura. Por lo tanto, un <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> de cero o nulo es coherente con su historial.</p>
+<p>Decisión de imputación: se imputará con la mediana de <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> dentro del Pipeline, usando <code class="docutils literal notranslate"><span class="pre">SimpleImputer(strategy='median')</span></code>. La mediana es preferible a la media en presencia de distribuciones sesgadas o outliers.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualización de valores faltantes</span>
@@ -968,11 +951,10 @@ Total filas con al menos un NaN: 11
 <img alt="_images/0bddfb4e7ba437b32ca604c6e614f27ec7b989c09147c68fba51cf7cc20b7f12.png" src="_images/0bddfb4e7ba437b32ca604c6e614f27ec7b989c09147c68fba51cf7cc20b7f12.png" />
 </div>
 </div>
-<p>La figura confirma que <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> es la <strong>única columna con valores faltantes</strong>, con un porcentaje de <strong>0.16%</strong> (11 filas sobre 7 043). Este porcentaje es lo suficientemente bajo como para justificar imputación en lugar de eliminación de filas, lo que preservaría el 99.84% de la información disponible.</p>
+<p>La figura confirma que <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> es la única columna con valores faltantes, con un porcentaje de 0.16% (11 filas sobre 7 043). Este porcentaje es lo suficientemente bajo como para justificar imputación en lugar de eliminación de filas, lo que preservaría el 99.84% de la información disponible.</p>
 </section>
 <section id="desbalance-de-clases-variable-objetivo-churn">
 <h2>1.5 Desbalance de clases — Variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code><a class="headerlink" href="#desbalance-de-clases-variable-objetivo-churn" title="Permalink to this heading">#</a></h2>
-<p>El desbalance de clases es un factor crítico en la predicción de churn: si el modelo simplemente predice siempre “No churn”, puede tener alta exactitud pero pésimo recall. Es importante cuantificarlo antes de modelar.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convertir Churn a binario (0/1)</span>
@@ -1004,19 +986,11 @@ Ratio de desbalance (No Churn / Churn): 2.77:1
 </div>
 </div>
 </div>
-<p>El <strong>ratio de desbalance es de 2.77:1</strong>, lo que significa que por cada cliente que abandona hay aproximadamente 3 que permanecen. Este desbalance es <strong>moderado</strong> (no extremo), pero suficiente para distorsionar la evaluación si se usa únicamente la métrica de <code class="docutils literal notranslate"><span class="pre">accuracy</span></code>.</p>
-<p><strong>Implicaciones para el modelado:</strong></p>
-<ul class="simple">
-<li><p>Usar <code class="docutils literal notranslate"><span class="pre">class_weight='balanced'</span></code> en Random Forest y LightGBM.</p></li>
-<li><p>Usar <code class="docutils literal notranslate"><span class="pre">scale_pos_weight</span> <span class="pre">=</span> <span class="pre">2.77</span></code> en XGBoost.</p></li>
-<li><p>Usar <code class="docutils literal notranslate"><span class="pre">auto_class_weights='Balanced'</span></code> en CatBoost.</p></li>
-<li><p>Priorizar <strong>F1-score</strong> y <strong>AUC-ROC</strong> como métricas de evaluación principales.</p></li>
-</ul>
+<p>El ratio de desbalance es de 2.77:1, lo que significa que por cada cliente que abandona hay aproximadamente 3 que permanecen. Este desbalance es <strong>moderado</strong> (no extremo), pero suficiente para distorsionar la evaluación si se usa únicamente la métrica de <code class="docutils literal notranslate"><span class="pre">accuracy</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-<span class="c1"># Gráfico de barras</span>
 <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#4C8EDA&#39;</span><span class="p">,</span> <span class="s1">&#39;#E05C5C&#39;</span><span class="p">]</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;No Churn&#39;</span><span class="p">,</span> <span class="s1">&#39;Churn&#39;</span><span class="p">]</span>
 <span class="n">bars</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">churn_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
@@ -1028,7 +1002,6 @@ Ratio de desbalance (No Churn / Churn): 2.77:1
 <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">churn_counts</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">FuncFormatter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
 
-<span class="c1"># Gráfico de torta</span>
 <span class="n">wedges</span><span class="p">,</span> <span class="n">texts</span><span class="p">,</span> <span class="n">autotexts</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span>
     <span class="n">churn_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
     <span class="n">autopct</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%1.1f%%</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">startangle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
@@ -1050,7 +1023,7 @@ Ratio de desbalance (No Churn / Churn): 2.77:1
 <img alt="_images/c820f1e719924df3caff0c5cd106625a189abb370b18aa1be87b51ad28b00b7e.png" src="_images/c820f1e719924df3caff0c5cd106625a189abb370b18aa1be87b51ad28b00b7e.png" />
 </div>
 </div>
-<p>El gráfico de barras y el diagrama de torta confirman el desbalance: la clase <code class="docutils literal notranslate"><span class="pre">Churn</span> <span class="pre">=</span> <span class="pre">1</span></code> representa solo el <strong>26.5% del total</strong>. Un clasificador que predijera siempre “No Churn” obtendría una exactitud del 73.5%, lo que ilustra por qué <code class="docutils literal notranslate"><span class="pre">accuracy</span></code> es una métrica engañosa en este problema.</p>
+<p>El gráfico de barras y el diagrama de torta confirman el desbalance: la clase <code class="docutils literal notranslate"><span class="pre">Churn</span> <span class="pre">=</span> <span class="pre">1</span></code> representa solo el 26.5% del total. Un clasificador que predijera siempre “No Churn” obtendría una exactitud del 73.5%, lo que ilustra por qué <code class="docutils literal notranslate"><span class="pre">accuracy</span></code> es una métrica engañosa en este problema.</p>
 </section>
 <section id="distribucion-de-variables-numericas">
 <h2>1.6 Distribución de variables numéricas<a class="headerlink" href="#distribucion-de-variables-numericas" title="Permalink to this heading">#</a></h2>
@@ -1110,30 +1083,30 @@ Ratio de desbalance (No Churn / Churn): 2.77:1
 <img alt="_images/0da4436673abbb799031b2782860d57252564b2b5240fd97f1a4e3ec6473dc5f.png" src="_images/0da4436673abbb799031b2782860d57252564b2b5240fd97f1a4e3ec6473dc5f.png" />
 </div>
 </div>
-<p>Las <strong>4 variables numéricas</strong> identificadas son: <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code>, <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> y <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>.</p>
-<p><strong><code class="docutils literal notranslate"><span class="pre">tenure</span></code> (antigüedad en meses):</strong></p>
+<p>Las 4 variables numéricas identificadas son: <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code>, <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> y <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tenure</span></code> (antigüedad en meses):</p>
 <ul class="simple">
 <li><p>Churn=1: media = 17.98 meses, mediana = 10 meses.</p></li>
 <li><p>Churn=0: media = 37.57 meses, mediana = 38 meses.</p></li>
-<li><p>La diferencia es <strong>estadísticamente significativa</strong> (prueba t, p &lt; 0.05). Los clientes que abandonan tienen una antigüedad notablemente menor, lo que sugiere que los primeros meses son el periodo crítico de fidelización.</p></li>
+<li><p>La diferencia es estadísticamente significativa (prueba t, p &lt; 0.05). Los clientes que abandonan tienen una antigüedad notablemente menor, lo que sugiere que los primeros meses son el periodo crítico de fidelización.</p></li>
 </ul>
-<p><strong><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> (cargo mensual):</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> (cargo mensual):</p>
 <ul class="simple">
 <li><p>Churn=1: media = $74.44, mediana = $79.65.</p></li>
 <li><p>Churn=0: media = $61.27, mediana = $64.43.</p></li>
-<li><p>Los clientes que hacen churn pagan en promedio <strong>$13 más al mes</strong>, lo que podría indicar que perciben menor valor por el costo del servicio.</p></li>
+<li><p>Los clientes que hacen churn pagan en promedio $13 más al mes, lo que podría indicar que perciben menor valor por el costo del servicio.</p></li>
 </ul>
-<p><strong><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> (cargos totales acumulados):</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> (cargos totales acumulados):</p>
 <ul class="simple">
 <li><p>Churn=1: media = $1 531, mediana = $703.</p></li>
 <li><p>Churn=0: media = $2 555, mediana = $1 683.</p></li>
 <li><p>Los clientes que no hacen churn han acumulado más cargos totales, coherente con su mayor antigüedad.</p></li>
 </ul>
-<p><strong><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>:</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>:</p>
 <ul class="simple">
 <li><p>Churn=1: media = 0.25 (25% son adultos mayores).</p></li>
 <li><p>Churn=0: media = 0.13 (13% son adultos mayores).</p></li>
-<li><p>Los adultos mayores tienen <strong>el doble de tasa de churn</strong>, posiblemente por menor adopción tecnológica o mayor sensibilidad al precio.</p></li>
+<li><p>Los adultos mayores tienen el doble de tasa de churn, posiblemente por menor adopción tecnológica o mayor sensibilidad al precio.</p></li>
 </ul>
 </section>
 <section id="distribucion-de-variables-categoricas-vs-churn">
@@ -1181,7 +1154,7 @@ Ratio de desbalance (No Churn / Churn): 2.77:1
 <img alt="_images/3496c330e5bc81b7b5bc8da664fd9f5e1ed4fd6305053fcbf54cfc26ac97b1a7.png" src="_images/3496c330e5bc81b7b5bc8da664fd9f5e1ed4fd6305053fcbf54cfc26ac97b1a7.png" />
 </div>
 </div>
-<p>Las <strong>15 variables categóricas</strong> muestran diferencias relevantes en la tasa de churn entre sus categorías:</p>
+<p>Las 15 variables categóricas muestran diferencias relevantes en la tasa de churn entre sus categorías:</p>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">Contract</span></code>:</strong> es la variable más discriminante. Los clientes con contrato <code class="docutils literal notranslate"><span class="pre">Month-to-month</span></code> presentan una tasa de churn de ~43%, frente al ~11% en contratos de un año y ~3% en contratos de dos años. El tipo de contrato es el predictor categórico más fuerte del dataset.</p></li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code>:</strong> los clientes que pagan con <code class="docutils literal notranslate"><span class="pre">Electronic</span> <span class="pre">check</span></code> tienen la mayor tasa de churn (~45%), mientras que los métodos de pago automático (tarjeta de crédito, transferencia bancaria) presentan tasas inferiores al 20%.</p></li>
@@ -1233,7 +1206,7 @@ SeniorCitizen     0.150889
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">tenure</span></code> tiene la correlación negativa más fuerte: a mayor antigüedad, menor probabilidad de churn.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code> tiene correlación positiva: a mayor cargo mensual, mayor probabilidad de churn.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> presenta alta correlación con <code class="docutils literal notranslate"><span class="pre">tenure</span></code> (r ≈ 0.83), lo que indica <strong>multicolinealidad</strong> entre ambas variables. Esto no afecta a los modelos de árbol, pero es importante considerarlo si se usaran modelos lineales o regresión logística.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code> presenta alta correlación con <code class="docutils literal notranslate"><span class="pre">tenure</span></code> (r ≈ 0.83), lo que indica multicolinealidad entre ambas variables. Esto no afecta a los modelos de árbol, pero es importante considerarlo si se usaran modelos lineales o regresión logística.</p></li>
 <li><p>Ninguna correlación supera 0.40 en valor absoluto, lo que confirma que el problema requiere modelos no lineales para capturar relaciones más complejas.</p></li>
 </ul>
 </section>
@@ -1319,13 +1292,13 @@ SeniorCitizen     0.150889
 </div>
 </div>
 <p>El análisis de los 9 servicios disponibles revela patrones claros de retención y riesgo:</p>
-<p><strong>Servicios protectores (menor tasa de churn al tenerlos):</strong></p>
+<p>Servicios protectores (menor tasa de churn al tenerlos):</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span></code>: clientes sin este servicio tienen tasa de churn ~42%; con el servicio, ~15%.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">TechSupport</span></code>: patrón similar; el soporte técnico reduce significativamente el abandono.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">OnlineBackup</span></code> y <code class="docutils literal notranslate"><span class="pre">DeviceProtection</span></code>: efecto protector moderado.</p></li>
 </ul>
-<p><strong>Servicios sin efecto diferenciador:</strong></p>
+<p>Servicios sin efecto diferenciador:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">StreamingTV</span></code> y <code class="docutils literal notranslate"><span class="pre">StreamingMovies</span></code>: tasas de churn similares entre quienes tienen y no tienen el servicio (~30%).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">PhoneService</span></code> y <code class="docutils literal notranslate"><span class="pre">MultipleLines</span></code>: impacto mínimo en la tasa de churn.</p></li>
@@ -1386,7 +1359,7 @@ Credit card (automatic)      12.4
 </div>
 </div>
 </div>
-<p>Con base en los datos observados, el <strong>perfil típico de un cliente que hace churn</strong> es:</p>
+<p>Con base en los datos observados, el perfil típico de un cliente que hace churn es:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Característica</p></th>
@@ -1415,7 +1388,7 @@ Credit card (automatic)      12.4
 </tbody>
 </table>
 </div>
-<p>En contraste, el <strong>cliente fidelizado</strong> (Churn=0) tiene una antigüedad media de 37.6 meses, paga $13 menos al mes en promedio, y predominantemente tiene contratos anuales o bianuales con métodos de pago automáticos.</p>
+<p>En contraste, el cliente fidelizado (Churn=0) tiene una antigüedad media de 37.6 meses, paga $13 menos al mes en promedio, y predominantemente tiene contratos anuales o bianuales con métodos de pago automáticos.</p>
 <p>Este perfil permite orientar las estrategias de intervención hacia clientes recientes con contrato mensual, facturación electrónica y sin servicios de seguridad contratados.</p>
 </section>
 <section id="guardar-dataset-limpio-para-el-siguiente-notebook">
@@ -1490,7 +1463,7 @@ Dataset limpio guardado en ../data/telco_churn_clean.csv
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Welcome to your Jupyter Book</p>
+        <p class="prev-next-title">Predicción de Churn en Telecomunicaciones</p>
       </div>
     </a>
     <a class="right-next"
@@ -1543,7 +1516,7 @@ Dataset limpio guardado en ../data/telco_churn_clean.csv
   <div class="footer-item">
     
 <p class="component-author">
-By David Estrada
+By David Estrada, Camilo Gonzales
 </p>
 
   </div>

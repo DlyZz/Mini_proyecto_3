@@ -1,0 +1,1322 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>3. Interpretabilidad con LIME — Telco Customer Churn &#8212; Mini proyecto 3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '3_interpretability';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Mini proyecto 3 - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Mini proyecto 3 - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Predicción de Churn en Telecomunicaciones
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1_eda_preprocessing.html">1. EDA  Telco Customer Churn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2_model_training.html">2. Preprocesamiento + Modelado con Pipelines y GridSearchCV</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2F3_interpretability.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/3_interpretability.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3. Interpretabilidad con LIME — Telco Customer Churn</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importaciones-y-configuracion">3.1 Importaciones y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-del-modelo-y-los-datos">3.2 Carga del modelo y los datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-del-limetabularexplainer">3.3 Configuración del <code class="docutils literal notranslate"><span class="pre">LimeTabularExplainer</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caso-1-cliente-de-alto-riesgo">3.4 Caso 1 — Cliente de alto riesgo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-caso-1">Análisis — Caso 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caso-2-cliente-de-bajo-riesgo">3.5 Caso 2 — Cliente de bajo riesgo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-caso-2">Análisis — Caso 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caso-3-cliente-en-la-frontera-de-decision-riesgo-medio">3.6 Caso 3 — Cliente en la frontera de decisión (riesgo medio)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-caso-3">Análisis — Caso 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-comparativo-de-los-tres-casos">3.7 Análisis comparativo de los tres casos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-comparativo">Análisis comparativo</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="interpretabilidad-con-lime-telco-customer-churn">
+<h1>3. Interpretabilidad con LIME — Telco Customer Churn<a class="headerlink" href="#interpretabilidad-con-lime-telco-customer-churn" title="Permalink to this heading">#</a></h1>
+<p>Este notebook aplica <strong>LIME</strong> (<em>Local Interpretable Model-agnostic Explanations</em>) sobre el pipeline XGBoost entrenado en el notebook 2, con el objetivo de explicar predicciones individuales de forma comprensible para equipos de negocio.</p>
+<p><strong>¿Por qué LIME?</strong><br />
+Los modelos de gradient boosting como XGBoost son cajas negras: predicen con alta precisión pero no revelan <em>por qué</em> toman cada decisión. LIME resuelve esto entrenando un modelo lineal simple (interpretable) en el vecindario local de cada instancia que se quiere explicar, identificando qué variables empujan la predicción hacia churn o hacia retención.</p>
+<section id="importaciones-y-configuracion">
+<h2>3.1 Importaciones y configuración<a class="headerlink" href="#importaciones-y-configuracion" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime.lime_tabular</span><span class="w"> </span><span class="kn">import</span> <span class="n">LimeTabularExplainer</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+<span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="carga-del-modelo-y-los-datos">
+<h2>3.2 Carga del modelo y los datos<a class="headerlink" href="#carga-del-modelo-y-los-datos" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../mlops/app/model.joblib&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pipeline cargado correctamente.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Tipo: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Pasos: </span><span class="si">{</span><span class="p">[</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">pipeline</span><span class="o">.</span><span class="n">steps</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/telco_churn_clean.csv&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Dataset cargado: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> filas x </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> columnas&quot;</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Churn&quot;</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Churn&quot;</span><span class="p">]</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.20</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span>
+    <span class="n">stratify</span><span class="o">=</span><span class="n">y</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Conjunto de entrenamiento : </span><span class="si">{</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> muestras&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Conjunto de test          : </span><span class="si">{</span><span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> muestras&quot;</span><span class="p">)</span>
+
+<span class="n">num_cols</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">cat_cols</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Variables numericas  (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">num_cols</span><span class="p">)</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">num_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variables categoricas (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat_cols</span><span class="p">)</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">cat_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Pipeline cargado correctamente.
+  Tipo: &lt;class &#39;sklearn.pipeline.Pipeline&#39;&gt;
+  Pasos: [&#39;preprocessor&#39;, &#39;clf&#39;]
+
+Dataset cargado: 7,043 filas x 20 columnas
+
+Conjunto de entrenamiento : 5,634 muestras
+Conjunto de test          : 1,409 muestras
+
+Variables numericas  (4): [&#39;SeniorCitizen&#39;, &#39;tenure&#39;, &#39;MonthlyCharges&#39;, &#39;TotalCharges&#39;]
+Variables categoricas (15): [&#39;gender&#39;, &#39;Partner&#39;, &#39;Dependents&#39;, &#39;PhoneService&#39;, &#39;MultipleLines&#39;, &#39;InternetService&#39;, &#39;OnlineSecurity&#39;, &#39;OnlineBackup&#39;, &#39;DeviceProtection&#39;, &#39;TechSupport&#39;, &#39;StreamingTV&#39;, &#39;StreamingMovies&#39;, &#39;Contract&#39;, &#39;PaperlessBilling&#39;, &#39;PaymentMethod&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Al cargar el pipeline completo con <code class="docutils literal notranslate"><span class="pre">joblib.load</span></code>, recuperamos <strong>todo</strong> lo entrenado en el notebook 2: el <code class="docutils literal notranslate"><span class="pre">ColumnTransformer</span></code> (con <code class="docutils literal notranslate"><span class="pre">SimpleImputer</span></code>, <code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code> y <code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> ya ajustados sobre los datos de entrenamiento) y el clasificador XGBoost con sus 100 árboles optimizados.</p>
+<p>La ejecución confirmó:</p>
+<ul class="simple">
+<li><p><strong>Pipeline cargado:</strong> <code class="docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code> con dos pasos: <code class="docutils literal notranslate"><span class="pre">preprocessor</span></code> y <code class="docutils literal notranslate"><span class="pre">clf</span></code>.</p></li>
+<li><p><strong>Dataset:</strong> 7 043 filas × 20 columnas (19 features + variable objetivo <code class="docutils literal notranslate"><span class="pre">Churn</span></code>).</p></li>
+<li><p><strong>División train/test:</strong> 5 634 muestras de entrenamiento / 1 409 de test, reproduciendo exactamente la misma semilla (<code class="docutils literal notranslate"><span class="pre">random_state=42</span></code>) y estratificación del notebook 2.</p></li>
+<li><p><strong>4 variables numéricas:</strong> <code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code>, <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code>, <code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code>.</p></li>
+<li><p><strong>15 variables categóricas:</strong> <code class="docutils literal notranslate"><span class="pre">gender</span></code>, <code class="docutils literal notranslate"><span class="pre">Partner</span></code>, <code class="docutils literal notranslate"><span class="pre">Dependents</span></code>, <code class="docutils literal notranslate"><span class="pre">PhoneService</span></code>, <code class="docutils literal notranslate"><span class="pre">MultipleLines</span></code>, <code class="docutils literal notranslate"><span class="pre">InternetService</span></code>, <code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span></code>, <code class="docutils literal notranslate"><span class="pre">OnlineBackup</span></code>, <code class="docutils literal notranslate"><span class="pre">DeviceProtection</span></code>, <code class="docutils literal notranslate"><span class="pre">TechSupport</span></code>, <code class="docutils literal notranslate"><span class="pre">StreamingTV</span></code>, <code class="docutils literal notranslate"><span class="pre">StreamingMovies</span></code>, <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, <code class="docutils literal notranslate"><span class="pre">PaperlessBilling</span></code>, <code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code>.</p></li>
+</ul>
+<p>Es fundamental reproducir la misma semilla y estratificación para que las instancias de test seleccionadas sean consistentes con los resultados reportados en el notebook 2.</p>
+</section>
+<section id="configuracion-del-limetabularexplainer">
+<h2>3.3 Configuración del <code class="docutils literal notranslate"><span class="pre">LimeTabularExplainer</span></code><a class="headerlink" href="#configuracion-del-limetabularexplainer" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LabelEncoder</span>
+
+<span class="n">label_encoders</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">X_train_enc</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">X_test_enc</span>  <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cat_cols</span><span class="p">:</span>
+    <span class="n">le</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+    <span class="n">le</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+    <span class="n">X_train_enc</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+    <span class="n">X_test_enc</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>  <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+    <span class="n">label_encoders</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">le</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">X_train_enc</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_fn</span><span class="p">(</span><span class="n">X_array</span><span class="p">):</span>
+
+    <span class="n">df_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_array</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">X_train</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cat_cols</span><span class="p">:</span>
+        <span class="n">le</span>  <span class="o">=</span> <span class="n">label_encoders</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">df_input</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">le</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">df_input</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">df_input</span><span class="p">)</span>
+
+
+<span class="n">cat_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">X_train_enc</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cat_cols</span><span class="p">]</span>
+
+<span class="n">categorical_names</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">X_train_enc</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">col</span><span class="p">):</span> <span class="nb">list</span><span class="p">(</span><span class="n">label_encoders</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cat_cols</span>
+<span class="p">}</span>
+
+<span class="n">explainer</span> <span class="o">=</span> <span class="n">LimeTabularExplainer</span><span class="p">(</span>
+    <span class="n">training_data</span>        <span class="o">=</span> <span class="n">X_train_enc</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">feature_names</span>        <span class="o">=</span> <span class="n">X_train_enc</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+    <span class="n">class_names</span>          <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;No Churn&quot;</span><span class="p">,</span> <span class="s2">&quot;Churn&quot;</span><span class="p">],</span>
+    <span class="n">categorical_features</span> <span class="o">=</span> <span class="n">cat_indices</span><span class="p">,</span>
+    <span class="n">categorical_names</span>    <span class="o">=</span> <span class="n">categorical_names</span><span class="p">,</span>
+    <span class="n">discretize_continuous</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">random_state</span>         <span class="o">=</span> <span class="n">RANDOM_STATE</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">LimeTabularExplainer configurado correctamente.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Features de entrenamiento  : </span><span class="si">{</span><span class="n">X_train_enc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Variables categóricas      : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Encoders ajustados para las variables categóricas.
+X_train_enc dtypes (todas deben ser numéricas):
+gender                int64
+SeniorCitizen         int64
+Partner               int64
+Dependents            int64
+tenure                int64
+PhoneService          int64
+MultipleLines         int64
+InternetService       int64
+OnlineSecurity        int64
+OnlineBackup          int64
+DeviceProtection      int64
+TechSupport           int64
+StreamingTV           int64
+StreamingMovies       int64
+Contract              int64
+PaperlessBilling      int64
+PaymentMethod         int64
+MonthlyCharges      float64
+TotalCharges        float64
+dtype: object
+
+LimeTabularExplainer configurado correctamente.
+  Features de entrenamiento  : 19
+  Variables categóricas      : 15
+  Discretización de numéricas: activada
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="caso-1-cliente-de-alto-riesgo">
+<h2>3.4 Caso 1 — Cliente de alto riesgo<a class="headerlink" href="#caso-1-cliente-de-alto-riesgo" title="Permalink to this heading">#</a></h2>
+<p><strong>Perfil esperado:</strong> cliente senior, contrato month-to-month, pago por electronic check, tenure bajo, sin servicios de seguridad. Representa el perfil de mayor riesgo identificado en el EDA.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_probs</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">churn_mask</span>    <span class="o">=</span> <span class="p">(</span><span class="n">y_test</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="n">high_risk_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">churn_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">test_probs</span><span class="p">[</span><span class="n">churn_mask</span><span class="p">])]</span>
+<span class="n">idx_caso1</span>     <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">high_risk_pos</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+
+<span class="n">instance_caso1</span>     <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso1</span><span class="p">]</span>      
+<span class="n">instance_caso1_enc</span> <span class="o">=</span> <span class="n">X_test_enc</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso1</span><span class="p">]</span>   
+<span class="n">prob_caso1</span>         <span class="o">=</span> <span class="n">test_probs</span><span class="p">[</span><span class="n">high_risk_pos</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CASO 1 — ALTO RIESGO&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Indice en el dataset : </span><span class="si">{</span><span class="n">idx_caso1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Churn real           : </span><span class="si">{</span><span class="n">y_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso1</span><span class="p">]</span><span class="si">}</span><span class="s2">  (1 = si hizo churn)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  P(Churn) predicha    : </span><span class="si">{</span><span class="n">prob_caso1</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="n">prob_caso1</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Caracteristicas del cliente:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">instance_caso1</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Valor&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=============================================
+CASO 1 — ALTO RIESGO
+=============================================
+  Indice en el dataset : 3380
+  Churn real           : 1  (1 = si hizo churn)
+  P(Churn) predicha    : 0.9646  (96.5%)
+
+Caracteristicas del cliente:
+                             Valor
+gender                        Male
+SeniorCitizen                    1
+Partner                        Yes
+Dependents                      No
+tenure                           1
+PhoneService                   Yes
+MultipleLines                  Yes
+InternetService        Fiber optic
+OnlineSecurity                  No
+OnlineBackup                    No
+DeviceProtection                No
+TechSupport                     No
+StreamingTV                    Yes
+StreamingMovies                Yes
+Contract            Month-to-month
+PaperlessBilling               Yes
+PaymentMethod     Electronic check
+MonthlyCharges                95.1
+TotalCharges                  95.1
+</pre></div>
+</div>
+</div>
+</div>
+<p>Al inspeccionar los valores del cliente, se confirma el <strong>perfil de máximo riesgo</strong> descrito en el EDA:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Característica</p></th>
+<th class="head"><p>Valor</p></th>
+<th class="head"><p>Señal</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tenure</span></code></p></td>
+<td><p><strong>1 mes</strong></p></td>
+<td><p>Clientela extremadamente nueva; sin lealtad formada</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Contract</span></code></p></td>
+<td><p><strong>Month-to-month</strong></p></td>
+<td><p>Sin compromiso de permanencia</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PaymentMethod</span></code></p></td>
+<td><p><strong>Electronic check</strong></p></td>
+<td><p>Método más asociado al churn (57.3% de los casos)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InternetService</span></code></p></td>
+<td><p><strong>Fiber optic</strong></p></td>
+<td><p>Servicio de mayor costo; mayor sensibilidad al precio</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Sin servicios de seguridad activos</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TechSupport</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Sin soporte técnico</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span></code></p></td>
+<td><p><strong>$95.10</strong></p></td>
+<td><p>Cargo elevado con bajo valor percibido</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TotalCharges</span></code></p></td>
+<td><p><strong>$95.10</strong></p></td>
+<td><p>Igual al cargo mensual; solo lleva 1 mes como cliente</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span></code></p></td>
+<td><p><strong>1</strong></p></td>
+<td><p>Adulto mayor (25% de los casos de churn)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Este cliente concentra <strong>todas</strong> las señales de riesgo identificadas en el EDA simultáneamente. El modelo le asigna una probabilidad de churn de <strong>96.5%</strong>, lo que lo posiciona como el caso de mayor certeza en el conjunto de test.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_caso1</span> <span class="o">=</span> <span class="n">explainer</span><span class="o">.</span><span class="n">explain_instance</span><span class="p">(</span>
+    <span class="n">data_row</span>   <span class="o">=</span> <span class="n">instance_caso1_enc</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">predict_fn</span><span class="p">,</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">num_samples</span>  <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="n">labels</span>       <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+<span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">exp_caso1</span><span class="o">.</span><span class="n">as_pyplot_figure</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;CASO 1 — ALTO RIESGO  |  P(Churn) = </span><span class="si">{</span><span class="n">prob_caso1</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%  |  Real: Churn&quot;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;fig_lime_caso1.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Figura guardada: fig_lime_caso1.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/00161aabb573a8244cbe502f67286fa21a2f158db1acce0392b94c15a7e7a90e.png" src="_images/00161aabb573a8244cbe502f67286fa21a2f158db1acce0392b94c15a7e7a90e.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Figura guardada: fig_lime_caso1.png
+</pre></div>
+</div>
+</div>
+</div>
+<section id="analisis-caso-1">
+<h3>Análisis — Caso 1<a class="headerlink" href="#analisis-caso-1" title="Permalink to this heading">#</a></h3>
+<p>La figura muestra las 10 variables con mayor peso local en la predicción de este cliente. <strong>Todas las barras son verdes</strong>, lo que significa que cada una de las características identificadas empuja en la misma dirección: hacia <code class="docutils literal notranslate"><span class="pre">Churn</span> <span class="pre">=</span> <span class="pre">1</span></code>. No hay ningún factor protector para este cliente.</p>
+<p><strong>Pesos locales por variable (en orden de importancia):</strong></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Peso LIME</p></th>
+<th class="head"><p>Interpretación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Contract</span> <span class="pre">=</span> <span class="pre">Month-to-month</span></code></p></td>
+<td><p><strong>+0.268</strong></p></td>
+<td><p>El factor más determinante. Sin contrato de permanencia, el cliente puede cancelar en cualquier momento sin penalización.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tenure</span> <span class="pre">&lt;=</span> <span class="pre">9</span></code></p></td>
+<td><p>+0.161</p></td>
+<td><p>Solo lleva 1 mes; los primeros meses son la ventana de mayor riesgo de abandono.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InternetService</span> <span class="pre">=</span> <span class="pre">Fiber</span> <span class="pre">optic</span></code></p></td>
+<td><p>+0.116</p></td>
+<td><p>El servicio de fibra óptica, al ser más costoso, genera mayor sensibilidad al precio.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span> <span class="pre">&gt;</span> <span class="pre">90</span></code></p></td>
+<td><p>+0.099</p></td>
+<td><p>Cargo mensual alto ($95.10); si el cliente no percibe valor, la relación costo/beneficio es negativa.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PaymentMethod</span> <span class="pre">=</span> <span class="pre">Electronic</span> <span class="pre">check</span></code></p></td>
+<td><p>+0.079</p></td>
+<td><p>Pago manual activo; no hay automatización que dificulte la cancelación.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span> <span class="pre">=</span> <span class="pre">No</span></code></p></td>
+<td><p>+0.069</p></td>
+<td><p>Ausencia del servicio protector más fuerte identificado en el EDA.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TechSupport</span> <span class="pre">=</span> <span class="pre">No</span></code></p></td>
+<td><p>+0.063</p></td>
+<td><p>Sin soporte técnico; mayor frustración ante problemas técnicos.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PaperlessBilling</span> <span class="pre">=</span> <span class="pre">Yes</span></code></p></td>
+<td><p>+0.058</p></td>
+<td><p>Clientes con facturación digital presentan mayor movilidad entre proveedores.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TotalCharges</span> <span class="pre">&lt;=</span> <span class="pre">408.85</span></code></p></td>
+<td><p>+0.057</p></td>
+<td><p>Cargos totales bajos = cliente nuevo = menor inversión en la relación.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">StreamingMovies</span> <span class="pre">=</span> <span class="pre">Yes</span></code></p></td>
+<td><p>+0.047</p></td>
+<td><p>Tiene servicios de streaming pero no de seguridad; perfil de consumo sin arraigo.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Coherencia con el EDA:</strong> todas las variables identificadas por LIME coinciden con los factores de riesgo detectados en el análisis exploratorio del notebook 1. Esto valida que el modelo XGBoost ha aprendido patrones reales del negocio.</p>
+<p><strong>Conclusión de negocio:</strong> Este cliente requiere intervención <strong>inmediata</strong> (en los primeros días). La acción más eficaz, dado el peso dominante del contrato, es una oferta de migración a un plan anual con descuento significativo, acompañada de una activación gratuita de <code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span></code> (el servicio protector con mayor peso en el EDA). Con solo 1 mes de antigüedad y $95.10 de cargo mensual, la empresa aún no ha recuperado el costo de adquisición de este cliente.</p>
+</section>
+</section>
+<section id="caso-2-cliente-de-bajo-riesgo">
+<h2>3.5 Caso 2 — Cliente de bajo riesgo<a class="headerlink" href="#caso-2-cliente-de-bajo-riesgo" title="Permalink to this heading">#</a></h2>
+<p><strong>Perfil esperado:</strong> cliente fidelizado, contrato de dos años, pago automático, tenure alto, con múltiples servicios de valor agregado. El modelo predice retención con alta certeza.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">no_churn_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_test</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="n">low_risk_pos</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">no_churn_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">test_probs</span><span class="p">[</span><span class="n">no_churn_mask</span><span class="p">])]</span>
+<span class="n">idx_caso2</span>     <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">low_risk_pos</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+
+<span class="n">instance_caso2</span>     <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso2</span><span class="p">]</span>
+<span class="n">instance_caso2_enc</span> <span class="o">=</span> <span class="n">X_test_enc</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso2</span><span class="p">]</span>
+<span class="n">prob_caso2</span>         <span class="o">=</span> <span class="n">test_probs</span><span class="p">[</span><span class="n">low_risk_pos</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CASO 2 — BAJO RIESGO&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Indice en el dataset : </span><span class="si">{</span><span class="n">idx_caso2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Churn real           : </span><span class="si">{</span><span class="n">y_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso2</span><span class="p">]</span><span class="si">}</span><span class="s2">  (0 = no hizo churn)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  P(Churn) predicha    : </span><span class="si">{</span><span class="n">prob_caso2</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="n">prob_caso2</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Caracteristicas del cliente:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">instance_caso2</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Valor&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=============================================
+CASO 2 — BAJO RIESGO
+=============================================
+  Indice en el dataset : 6423
+  Churn real           : 0  (0 = no hizo churn)
+  P(Churn) predicha    : 0.0074  (0.7%)
+
+Caracteristicas del cliente:
+                                    Valor
+gender                             Female
+SeniorCitizen                           0
+Partner                               Yes
+Dependents                            Yes
+tenure                                 72
+PhoneService                          Yes
+MultipleLines                         Yes
+InternetService                        No
+OnlineSecurity        No internet service
+OnlineBackup          No internet service
+DeviceProtection      No internet service
+TechSupport           No internet service
+StreamingTV           No internet service
+StreamingMovies       No internet service
+Contract                         Two year
+PaperlessBilling                       No
+PaymentMethod     Credit card (automatic)
+MonthlyCharges                      24.25
+TotalCharges                       1784.5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_caso2</span> <span class="o">=</span> <span class="n">explainer</span><span class="o">.</span><span class="n">explain_instance</span><span class="p">(</span>
+    <span class="n">data_row</span>   <span class="o">=</span> <span class="n">instance_caso2_enc</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">predict_fn</span><span class="p">,</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">num_samples</span>  <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="n">labels</span>       <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+<span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">exp_caso2</span><span class="o">.</span><span class="n">as_pyplot_figure</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;CASO 2 — BAJO RIESGO  |  P(Churn) = </span><span class="si">{</span><span class="n">prob_caso2</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%  |  Real: No Churn&quot;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;fig_lime_caso2.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Figura guardada: fig_lime_caso2.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/0c11f82a4f674380237802de46bddf3b1124ee5365092520ddc5de11e835f86d.png" src="_images/0c11f82a4f674380237802de46bddf3b1124ee5365092520ddc5de11e835f86d.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Figura guardada: fig_lime_caso2.png
+</pre></div>
+</div>
+</div>
+</div>
+<section id="analisis-caso-2">
+<h3>Análisis — Caso 2<a class="headerlink" href="#analisis-caso-2" title="Permalink to this heading">#</a></h3>
+<p>La figura muestra el patrón inverso al Caso 1: <strong>casi todas las barras son rojas</strong> (hacia <code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">Churn</span></code>), con un único factor verde marginal. El modelo asigna una probabilidad de churn de apenas <strong>0.7%</strong>, prácticamente certeza de retención.</p>
+<p><strong>Pesos locales por variable (en orden de importancia):</strong></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Peso LIME</p></th>
+<th class="head"><p>Interpretación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Contract</span> <span class="pre">=</span> <span class="pre">Two</span> <span class="pre">year</span></code></p></td>
+<td><p><strong>−0.287</strong></p></td>
+<td><p>El factor protector más fuerte. El compromiso contractual de dos años ancla al cliente.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tenure</span> <span class="pre">&gt;</span> <span class="pre">55</span></code></p></td>
+<td><p>−0.148</p></td>
+<td><p>72 meses como cliente (6 años); la antigüedad genera lealtad y costo de cambio percibido.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InternetService</span> <span class="pre">=</span> <span class="pre">No</span></code></p></td>
+<td><p>−0.076</p></td>
+<td><p>Sin servicio de internet; menor exposición a problemas de conectividad y menor gasto.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span> <span class="pre">&lt;=</span> <span class="pre">35.66</span></code></p></td>
+<td><p>−0.072</p></td>
+<td><p>Cargo mensual muy bajo ($24.25); excelente relación costo/beneficio percibida.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PaperlessBilling</span> <span class="pre">=</span> <span class="pre">No</span></code></p></td>
+<td><p>−0.059</p></td>
+<td><p>Facturación física; perfil más tradicional con menor movilidad entre proveedores.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TechSupport</span> <span class="pre">=</span> <span class="pre">No</span> <span class="pre">internet</span> <span class="pre">service</span></code></p></td>
+<td><p>−0.045</p></td>
+<td><p>No aplica por no tener internet; no genera fricción.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span> <span class="pre">=</span> <span class="pre">No</span> <span class="pre">internet</span> <span class="pre">service</span></code></p></td>
+<td><p>−0.043</p></td>
+<td><p>Ídem; la ausencia de internet elimina la necesidad de servicios asociados.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">1397</span> <span class="pre">&lt;</span> <span class="pre">TotalCharges</span> <span class="pre">&lt;=</span> <span class="pre">3835</span></code></p></td>
+<td><p>−0.034</p></td>
+<td><p>Cargos totales moderados (realmente son $1 784.50); refleja relación duradera.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MultipleLines</span> <span class="pre">=</span> <span class="pre">Yes</span></code></p></td>
+<td><p><strong>+0.031</strong></p></td>
+<td><p>Única señal leve de riesgo: múltiples líneas pueden indicar mayor gasto susceptible de recorte.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Dependents</span> <span class="pre">=</span> <span class="pre">Yes</span></code></p></td>
+<td><p>−0.028</p></td>
+<td><p>Tener dependientes reduce la disposición a cambiar de proveedor (mayor estabilidad familiar).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Nota sobre <code class="docutils literal notranslate"><span class="pre">MultipleLines</span> <span class="pre">=</span> <span class="pre">Yes</span></code>:</strong> es la única barra verde (factor de riesgo leve) en este cliente. Sin embargo, con un peso de +0.031 frente a factores protectores que suman más de −0.79, su efecto es completamente dominado. LIME captura incluso señales débiles en sentido contrario.</p>
+<p><strong>Coherencia con el EDA:</strong> el contrato de dos años y la alta antigüedad (72 meses) son exactamente los factores de retención más sólidos identificados en el análisis exploratorio. El cargo mensual de <span class="math notranslate nohighlight">\(24.25 es inferior a la media de clientes no-churn (\)</span>61.27), lo que refuerza la percepción de valor.</p>
+<p><strong>Conclusión de negocio:</strong> Este cliente no necesita campañas de retención reactivas. Con 6 años de antigüedad, contrato de dos años y cargo mensual bajo, el riesgo es mínimo. La recomendación es incluirlo en programas de <strong>fidelización proactiva</strong>: descuentos por renovación del contrato, ofertas de upgrade de plan o programas de referidos. Invertir presupuesto de retención en este perfil sería ineficiente.</p>
+</section>
+</section>
+<section id="caso-3-cliente-en-la-frontera-de-decision-riesgo-medio">
+<h2>3.6 Caso 3 — Cliente en la frontera de decisión (riesgo medio)<a class="headerlink" href="#caso-3-cliente-en-la-frontera-de-decision-riesgo-medio" title="Permalink to this heading">#</a></h2>
+<p><strong>Perfil:</strong> cliente con señales fuertemente contradictorias. El modelo asigna <strong>P(Churn) = 50.1%</strong>, prácticamente en el umbral de decisión. Notablemente, el churn real es <strong>0</strong> (no abandonó), lo que hace este caso especialmente interesante para analizar los límites del modelo.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mid_risk_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">test_probs</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">idx_caso3</span>    <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">mid_risk_pos</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+
+<span class="n">instance_caso3</span>     <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso3</span><span class="p">]</span>
+<span class="n">instance_caso3_enc</span> <span class="o">=</span> <span class="n">X_test_enc</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso3</span><span class="p">]</span>
+<span class="n">prob_caso3</span>         <span class="o">=</span> <span class="n">test_probs</span><span class="p">[</span><span class="n">mid_risk_pos</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CASO 3 — RIESGO MEDIO&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Indice en el dataset : </span><span class="si">{</span><span class="n">idx_caso3</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Churn real           : </span><span class="si">{</span><span class="n">y_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso3</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  P(Churn) predicha    : </span><span class="si">{</span><span class="n">prob_caso3</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="n">prob_caso3</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Caracteristicas del cliente:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">instance_caso3</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Valor&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=============================================
+CASO 3 — RIESGO MEDIO
+=============================================
+  Indice en el dataset : 1517
+  Churn real           : 0
+  P(Churn) predicha    : 0.5010  (50.1%)
+
+Caracteristicas del cliente:
+                             Valor
+gender                        Male
+SeniorCitizen                    0
+Partner                        Yes
+Dependents                      No
+tenure                          56
+PhoneService                   Yes
+MultipleLines                  Yes
+InternetService        Fiber optic
+OnlineSecurity                 Yes
+OnlineBackup                    No
+DeviceProtection                No
+TechSupport                     No
+StreamingTV                    Yes
+StreamingMovies                Yes
+Contract                  One year
+PaperlessBilling               Yes
+PaymentMethod     Electronic check
+MonthlyCharges              100.55
+TotalCharges               5514.95
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">real_label</span> <span class="o">=</span> <span class="s2">&quot;Churn&quot;</span> <span class="k">if</span> <span class="n">y_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso3</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;No Churn&quot;</span>
+
+<span class="n">exp_caso3</span> <span class="o">=</span> <span class="n">explainer</span><span class="o">.</span><span class="n">explain_instance</span><span class="p">(</span>
+    <span class="n">data_row</span>   <span class="o">=</span> <span class="n">instance_caso3_enc</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">predict_fn</span><span class="p">,</span>
+    <span class="n">num_features</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">num_samples</span>  <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="n">labels</span>       <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+<span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">exp_caso3</span><span class="o">.</span><span class="n">as_pyplot_figure</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;CASO 3 — RIESGO MEDIO  |  P(Churn) = </span><span class="si">{</span><span class="n">prob_caso3</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%  |  Real: </span><span class="si">{</span><span class="n">real_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;fig_lime_caso3.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Figura guardada: fig_lime_caso3.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/52acac820c732cb44374d0ee6890027d95de2cdb6d4cd798cc79d7651f68981d.png" src="_images/52acac820c732cb44374d0ee6890027d95de2cdb6d4cd798cc79d7651f68981d.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Figura guardada: fig_lime_caso3.png
+</pre></div>
+</div>
+</div>
+</div>
+<section id="analisis-caso-3">
+<h3>Análisis — Caso 3<a class="headerlink" href="#analisis-caso-3" title="Permalink to this heading">#</a></h3>
+<p>Este es el caso más rico analíticamente. A diferencia de los casos 1 y 2, la figura muestra <strong>barras verdes y rojas de peso comparable</strong>, lo que explica por qué el modelo oscila alrededor del 50%.</p>
+<p><strong>Pesos locales por variable:</strong></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Peso LIME</p></th>
+<th class="head"><p>Dirección</p></th>
+<th class="head"><p>Interpretación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InternetService</span> <span class="pre">=</span> <span class="pre">Fiber</span> <span class="pre">optic</span></code></p></td>
+<td><p>+0.123</p></td>
+<td><p>→ Churn</p></td>
+<td><p>Fibra óptica = alto costo; factor de riesgo consistente con el Caso 1.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span> <span class="pre">&gt;</span> <span class="pre">90</span></code></p></td>
+<td><p>+0.092</p></td>
+<td><p>→ Churn</p></td>
+<td><p>Cargo de $100.55; el más alto de los tres casos.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PaymentMethod</span> <span class="pre">=</span> <span class="pre">Electronic</span> <span class="pre">check</span></code></p></td>
+<td><p>+0.085</p></td>
+<td><p>→ Churn</p></td>
+<td><p>Pago manual activo; mismo factor de riesgo que en el Caso 1.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TechSupport</span> <span class="pre">=</span> <span class="pre">No</span></code></p></td>
+<td><p>+0.068</p></td>
+<td><p>→ Churn</p></td>
+<td><p>Sin soporte técnico a pesar del alto cargo mensual.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PaperlessBilling</span> <span class="pre">=</span> <span class="pre">Yes</span></code></p></td>
+<td><p>+0.051</p></td>
+<td><p>→ Churn</p></td>
+<td><p>Facturación digital; mayor movilidad.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tenure</span> <span class="pre">&gt;</span> <span class="pre">55</span></code></p></td>
+<td><p><strong>−0.104</strong></p></td>
+<td><p>→ No Churn</p></td>
+<td><p>56 meses como cliente; la antigüedad compensa los factores de riesgo.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Contract</span> <span class="pre">=</span> <span class="pre">One</span> <span class="pre">year</span></code></p></td>
+<td><p><strong>−0.098</strong></p></td>
+<td><p>→ No Churn</p></td>
+<td><p>Contrato anual; menos protector que el de dos años, pero genera compromiso.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span> <span class="pre">=</span> <span class="pre">Yes</span></code></p></td>
+<td><p>−0.056</p></td>
+<td><p>→ No Churn</p></td>
+<td><p>Tiene seguridad online activa; percibe valor en los servicios adicionales.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TotalCharges</span> <span class="pre">&gt;</span> <span class="pre">3835</span></code></p></td>
+<td><p>−0.041</p></td>
+<td><p>→ No Churn</p></td>
+<td><p>$5 514.95 en cargos totales; alta inversión acumulada en la relación.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SeniorCitizen</span> <span class="pre">&lt;=</span> <span class="pre">0</span></code></p></td>
+<td><p>−0.040</p></td>
+<td><p>→ No Churn</p></td>
+<td><p>No es adulto mayor; menor factor de riesgo demográfico.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>¿Por qué el modelo predice 50.1% y el cliente realmente no hizo churn?</strong></p>
+<p>Los factores de retención (<code class="docutils literal notranslate"><span class="pre">tenure</span></code> alto, contrato anual, <code class="docutils literal notranslate"><span class="pre">OnlineSecurity</span> <span class="pre">=</span> <span class="pre">Yes</span></code>, cargos totales altos) logran neutralizar con escaso margen los factores de riesgo (<code class="docutils literal notranslate"><span class="pre">Fiber</span> <span class="pre">optic</span></code>, <code class="docutils literal notranslate"><span class="pre">MonthlyCharges</span> <span class="pre">&gt;</span> <span class="pre">90</span></code>, <code class="docutils literal notranslate"><span class="pre">Electronic</span> <span class="pre">check</span></code>). El modelo tiene razón en ser incierto: este es exactamente el tipo de cliente que, ante un evento negativo (una mala experiencia de soporte, una oferta de competidor), podría irse.</p>
+<p><strong>Lo que LIME revela aquí que la importancia global no captura:</strong> el contrato de un año tiene peso <em>protector</em> local significativo (−0.098) para este cliente, incluso cuando globalmente no aparece entre las variables más importantes. Esto ilustra la riqueza de las explicaciones locales.</p>
+<p><strong>Conclusión de negocio:</strong> Este cliente es la <strong>prioridad número 1</strong> para intervención preventiva. Tiene 56 meses de antigüedad (valor alto) pero paga $100.55/mes por fibra óptica sin soporte técnico y con pago manual. La acción recomendada es una llamada de verificación de satisfacción combinada con una oferta de activación de <code class="docutils literal notranslate"><span class="pre">TechSupport</span></code> y migración del pago a automático. Ambas acciones atacarían directamente los dos factores de riesgo con mayor peso en este cliente específico.</p>
+</section>
+</section>
+<section id="analisis-comparativo-de-los-tres-casos">
+<h2>3.7 Análisis comparativo de los tres casos<a class="headerlink" href="#analisis-comparativo-de-los-tres-casos" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resumen</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;Caso&quot;</span><span class="p">:</span>           <span class="p">[</span><span class="s2">&quot;Caso 1 — Alto riesgo&quot;</span><span class="p">,</span> <span class="s2">&quot;Caso 2 — Bajo riesgo&quot;</span><span class="p">,</span> <span class="s2">&quot;Caso 3 — Riesgo medio&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;P(Churn)&quot;</span><span class="p">:</span>       <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prob_caso1</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prob_caso2</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prob_caso3</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Churn real&quot;</span><span class="p">:</span>     <span class="p">[</span><span class="n">y_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso1</span><span class="p">],</span> <span class="n">y_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso2</span><span class="p">],</span> <span class="n">y_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_caso3</span><span class="p">]],</span>
+    <span class="s2">&quot;Nivel riesgo&quot;</span><span class="p">:</span>   <span class="p">[</span><span class="s2">&quot;ALTO&quot;</span><span class="p">,</span> <span class="s2">&quot;BAJO&quot;</span><span class="p">,</span> <span class="s2">&quot;MEDIO&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Accion sugerida&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Oferta inmediata: contrato anual + OnlineSecurity gratis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Programa de fidelizacion / upgrade de servicios&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Intenvencion preventiva: llamada de satisfaccion + servicio de prueba&quot;</span>
+    <span class="p">]</span>
+<span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">resumen</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                 Caso P(Churn)  Churn real Nivel riesgo                                                       Accion sugerida
+ Caso 1 — Alto riesgo    96.5%           1         ALTO              Oferta inmediata: contrato anual + OnlineSecurity gratis
+ Caso 2 — Bajo riesgo     0.7%           0         BAJO                       Programa de fidelizacion / upgrade de servicios
+Caso 3 — Riesgo medio    50.1%           0        MEDIO Intenvencion preventiva: llamada de satisfaccion + servicio de prueba
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">casos</span>   <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Caso 1</span><span class="se">\n</span><span class="s2">(Alto riesgo)&quot;</span><span class="p">,</span> <span class="s2">&quot;Caso 2</span><span class="se">\n</span><span class="s2">(Bajo riesgo)&quot;</span><span class="p">,</span> <span class="s2">&quot;Caso 3</span><span class="se">\n</span><span class="s2">(Riesgo medio)&quot;</span><span class="p">]</span>
+<span class="n">probs_v</span> <span class="o">=</span> <span class="p">[</span><span class="n">prob_caso1</span><span class="p">,</span> <span class="n">prob_caso2</span><span class="p">,</span> <span class="n">prob_caso3</span><span class="p">]</span>
+<span class="n">colores</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#E05C5C&quot;</span><span class="p">,</span> <span class="s2">&quot;#4C8EDA&quot;</span><span class="p">,</span> <span class="s2">&quot;#F0A500&quot;</span><span class="p">]</span>
+
+<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">casos</span><span class="p">,</span> <span class="p">[</span><span class="n">p</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probs_v</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">colores</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Umbral = 50%&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">probs_v</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">p</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;P(Churn) (%)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparativa de probabilidad de churn — Tres casos LIME&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">115</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[[</span><span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;fig_lime_comparativa.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Figura guardada: fig_lime_comparativa.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/242f64f25f59c8bb4dce33e09ad5c692ce3238204588fb33b61a3c25b24fed60.png" src="_images/242f64f25f59c8bb4dce33e09ad5c692ce3238204588fb33b61a3c25b24fed60.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Figura guardada: fig_lime_comparativa.png
+</pre></div>
+</div>
+</div>
+</div>
+<section id="analisis-comparativo">
+<h3>Análisis comparativo<a class="headerlink" href="#analisis-comparativo" title="Permalink to this heading">#</a></h3>
+<p>El gráfico de barras horizontales confirma la separación entre los tres casos: Caso 1 (96.5%) y Caso 2 (0.7%) están en los extremos opuestos del espectro, mientras que el Caso 3 (50.1%) está prácticamente en el umbral de decisión.</p>
+<p><strong>Tabla resumen de los tres casos ejecutados:</strong></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Caso</p></th>
+<th class="head"><p>Índice</p></th>
+<th class="head"><p>P(Churn)</p></th>
+<th class="head"><p>Churn real</p></th>
+<th class="head"><p>Nivel riesgo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Caso 1 — Alto riesgo</p></td>
+<td><p>3380</p></td>
+<td><p><strong>96.5%</strong></p></td>
+<td><p>1 (✓ correcto)</p></td>
+<td><p>ALTO</p></td>
+</tr>
+<tr class="row-odd"><td><p>Caso 2 — Bajo riesgo</p></td>
+<td><p>6423</p></td>
+<td><p><strong>0.7%</strong></p></td>
+<td><p>0 (✓ correcto)</p></td>
+<td><p>BAJO</p></td>
+</tr>
+<tr class="row-even"><td><p>Caso 3 — Riesgo medio</p></td>
+<td><p>1517</p></td>
+<td><p><strong>50.1%</strong></p></td>
+<td><p>0 (falso positivo)</p></td>
+<td><p>MEDIO</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Observaciones clave:</strong></p>
+<p><strong>Predicciones correctas en los extremos:</strong> el modelo clasifica correctamente los casos 1 y 2 con alta certeza. El Caso 1 tiene todas las señales de riesgo alineadas; el Caso 2 tiene todas las señales de retención alineadas. LIME confirma que no hay ambigüedad en ninguno de los dos.</p>
+<p><strong>Falso positivo en la frontera:</strong> el Caso 3 es un falso positivo (el modelo predice churn probable, pero el cliente no abandonó). Esto es esperable: con P(Churn) = 50.1%, el modelo está esencialmente diciendo “no tengo certeza”. En la práctica, los clientes en este rango son los más valiosos para intervenir precisamente porque están en equilibrio entre quedarse e irse.</p>
+<p><strong>Consistencia con el EDA y la importancia global:</strong> las tres variables que aparecen más frecuentemente en las explicaciones LIME de los tres casos son <code class="docutils literal notranslate"><span class="pre">Contract</span></code>, <code class="docutils literal notranslate"><span class="pre">tenure</span></code> e <code class="docutils literal notranslate"><span class="pre">InternetService</span></code>. Esto es consistente con las variables top identificadas en la importancia global del notebook 2, lo que valida la coherencia del modelo.</p>
+<p><strong>Valor diferencial de LIME:</strong> la importancia global dice que <code class="docutils literal notranslate"><span class="pre">tenure</span></code> es una de las variables más importantes en promedio. LIME revela que en el Caso 2 pesa −0.148 y en el Caso 3 pesa −0.104, pero en el Caso 1 (cliente con tenure=1) es la segunda variable más importante con +0.161. Esta asimetría local es imposible de capturar con métricas globales.</p>
+<p><strong>1. Implicaciones para el negocio:</strong></p>
+<p>El contrato (<code class="docutils literal notranslate"><span class="pre">Contract</span></code>) es el palanca de retención más poderosa en todos los casos. Una estrategia de retención proactiva debería priorizar la migración de contratos mensuales a anuales como primera acción, por encima de cualquier otra intervención.</p>
+<p><strong>2. Limitaciones de LIME identificadas:</strong></p>
+<ul class="simple">
+<li><p>El Caso 3 demuestra que cerca del umbral 0.5 el modelo tiene alta incertidumbre; las explicaciones de LIME en este rango son menos estables entre ejecuciones.</p></li>
+<li><p>Las explicaciones son locales: el peso de <code class="docutils literal notranslate"><span class="pre">InternetService</span> <span class="pre">=</span> <span class="pre">Fiber</span> <span class="pre">optic</span></code> es +0.116 en el Caso 1 pero +0.123 en el Caso 3, mientras que en el Caso 2 el cliente no tiene internet y la variable no aparece. Esto es correcto (explicaciones locales), pero hay que evitar generalizar un peso individual a todos los clientes.</p></li>
+<li><p>Se usaron <code class="docutils literal notranslate"><span class="pre">num_samples=5000</span></code> y <code class="docutils literal notranslate"><span class="pre">random_state=42</span></code> para maximizar la estabilidad de las explicaciones.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importaciones-y-configuracion">3.1 Importaciones y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-del-modelo-y-los-datos">3.2 Carga del modelo y los datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion-del-limetabularexplainer">3.3 Configuración del <code class="docutils literal notranslate"><span class="pre">LimeTabularExplainer</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caso-1-cliente-de-alto-riesgo">3.4 Caso 1 — Cliente de alto riesgo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-caso-1">Análisis — Caso 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caso-2-cliente-de-bajo-riesgo">3.5 Caso 2 — Cliente de bajo riesgo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-caso-2">Análisis — Caso 2</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#caso-3-cliente-en-la-frontera-de-decision-riesgo-medio">3.6 Caso 3 — Cliente en la frontera de decisión (riesgo medio)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-caso-3">Análisis — Caso 3</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-comparativo-de-los-tres-casos">3.7 Análisis comparativo de los tres casos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-comparativo">Análisis comparativo</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By David Estrada, Camilo Gonzales
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
